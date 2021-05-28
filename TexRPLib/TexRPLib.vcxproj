@@ -94,10 +94,22 @@
     <ClInclude Include="include\TexRPLib\GPUInterface.h" />
     <ClInclude Include="include\TexRPLib\TEXRP.h" />
     <ClInclude Include="include\TexRPLib\WinInclude.h" />
+    <ClInclude Include="src\CPU\Textures\TextureMeta.h" />
+    <ClInclude Include="src\CPU\Textures\TextureIO.h" />
+    <ClInclude Include="src\CPU\Textures\TextureTools.h" />
+    <ClInclude Include="src\GPU\Commands\CommandList.h" />
+    <ClInclude Include="src\GPU\Commands\CommandQueue.h" />
+    <ClInclude Include="src\GPU\IM_GPUContext.h" />
     <ClInclude Include="src\GPU\IM_GPUInterface.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\CPU\Textures\TextureIO.cpp" />
+    <ClCompile Include="src\CPU\Textures\TextureTools.cpp" />
+    <ClCompile Include="src\DllMain.cpp" />
+    <ClCompile Include="src\GPU\Commands\CommandList.cpp" />
+    <ClCompile Include="src\GPU\Commands\CommandQueue.cpp" />
     <ClCompile Include="src\GPU\GPUInterface.cpp" />
+    <ClCompile Include="src\GPU\IM_GPUContext.cpp" />
     <ClCompile Include="src\GPU\IM_GPUInterface.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

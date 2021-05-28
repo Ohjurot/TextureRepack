@@ -1,6 +1,8 @@
 #pragma once
 
+#include <TexRPLib/WinInclude.h>
 #include <TexRPLib/GPUInterface.h>
+#include <GPU/IM_GPUContext.h>
 
 namespace TexRPLib {
 	// Represents an interface to the gpu (IDXGIAdpter)
@@ -14,6 +16,8 @@ namespace TexRPLib {
 			LUID getGPUUniqueId() override;
 			UINT64 getGPUFreeVRAM() override;
 			TexRPLib::IGPUContext* createContex() override;
+			bool setVRAMReservation(UINT64 numByte) override;
+			UINT64 getVRAMReservation() override;
 
 			// Adpter getter
 			IDXGIAdapter* getAdpter();

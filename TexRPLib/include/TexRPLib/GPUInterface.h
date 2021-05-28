@@ -7,6 +7,9 @@
 namespace TexRPLib {
 	class IGPUInterface {
 		public:
+			// Virtual destructor
+			virtual ~IGPUInterface() {};
+
 			// Retrive the name of the gpu
 			virtual const wchar_t* getGPUName() = 0;
 
@@ -15,6 +18,12 @@ namespace TexRPLib {
 
 			// Retrive the current free gpu ram
 			virtual UINT64 getGPUFreeVRAM() = 0;
+
+			// Set current vram reservation
+			virtual bool setVRAMReservation(UINT64 numByte) = 0;
+
+			// Get current vram reservation
+			virtual UINT64 getVRAMReservation() = 0;
 
 			// Create GPU Contex
 			virtual TexRPLib::IGPUContext* createContex() = 0;
