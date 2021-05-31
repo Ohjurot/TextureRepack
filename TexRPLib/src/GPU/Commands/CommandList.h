@@ -12,6 +12,15 @@ namespace TexRP {
 			// Pre destructor release
 			void release();
 
+			// Close command list
+			void close();
+
+			// Reset command list
+			void reset();
+
+			// Getters
+			ID3D12GraphicsCommandList* ptr();
+
 			// Operator overloading
 			ID3D12GraphicsCommandList* operator->();
 			operator ID3D12GraphicsCommandList* ();

@@ -73,6 +73,10 @@ void TexRP::GPUCommandQueue::release() {
 	m_ptrCommandQueue.ReleaseAndGetAddressOf();
 }
 
+ID3D12CommandQueue* TexRP::GPUCommandQueue::ptr() {
+	return m_ptrCommandQueue.Get();
+}
+
 ID3D12CommandQueue* TexRP::GPUCommandQueue::operator->() {
 	return m_ptrCommandQueue.Get();
 }

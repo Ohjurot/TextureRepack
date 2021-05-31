@@ -10,6 +10,7 @@
 
 // DEBUG INCLUDES
 #include <CPU/Textures/TextureIO.h>
+#include <GPU/Textures/IM_GPUTextureStack.h>
 // END DEBUG
 
 namespace TexRPLib {

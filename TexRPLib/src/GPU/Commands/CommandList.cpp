@@ -20,6 +20,19 @@ void TexRP::GPUCommandList::release() {
 	m_ptrCommandAllocator.ReleaseAndGetAddressOf();
 }
 
+void TexRP::GPUCommandList::close() {
+	m_ptrCommandList->Close();
+}
+
+void TexRP::GPUCommandList::reset() {
+	m_ptrCommandAllocator->Reset();
+	m_ptrCommandList->Reset(m_ptrCommandAllocator.Get(), NULL);
+}
+
+ID3D12GraphicsCommandList* TexRP::GPUCommandList::ptr() {
+	return m_ptrCommandList.Get();
+}
+
 ID3D12GraphicsCommandList* TexRP::GPUCommandList::operator->() {
 	return m_ptrCommandList.Get();
 }

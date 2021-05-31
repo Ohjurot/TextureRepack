@@ -54,7 +54,7 @@
     <ClInclude Include="src\GPU\Textures\IM_GPUTextureStack.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\vendor\renderdoc_app.h">
+    <ClInclude Include="src\Util\MallocdMemory.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -81,6 +81,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\CPU\Textures\TextureTools.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPU\Textures\IM_GPUTextureStack.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

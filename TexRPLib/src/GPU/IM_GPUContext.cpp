@@ -55,7 +55,16 @@ bool TexRPLib::IM_GPUContext::init(IDXGIAdapter* ptrAdpter) {
 	}
 
 	// DEBUG VERY VERY DIRTY TO DO THAT HERE BUT DLL DOES NOT EXPOSE ALL REQUIRED CLASSES TO TEST THIS DURING DEVELOPMENT
-
+	TexRPLib::IM_GPUTextureStack* ptrStack = TexRPAllocate(TexRPLib::IM_GPUTextureStack, TexRPLib::IM_GPUTextureStack);
+	if (ptrStack->init(m_ptrDevice.Get(), &m_directCommandQueue, &m_directCommandList)) {
+		auto rrs = ptrStack->reset(2048, 2048, 32, 32);
+		auto idBoxBase = ptrStack->loadFromDisk("./3guys_Box_BaseColor.png");
+		auto idBoxHeight = ptrStack->loadFromDisk("./3guys_Box_Height.png");
+		auto idBoxMetallic = ptrStack->loadFromDisk("./3guys_Box_Metallic.png");
+		auto idBoxNormal = ptrStack->loadFromDisk("./3guys_Box_Normal.png");
+		auto idBoxRoughness = ptrStack->loadFromDisk("./3guys_Box_Roughness.png");
+	}
+	TexRPDestroy(ptrStack);
 	// END DEBUG
 
 	// Passed

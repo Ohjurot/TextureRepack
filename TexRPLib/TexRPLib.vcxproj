@@ -103,7 +103,7 @@
     <ClInclude Include="src\GPU\IM_GPUContext.h" />
     <ClInclude Include="src\GPU\IM_GPUInterface.h" />
     <ClInclude Include="src\GPU\Textures\IM_GPUTextureStack.h" />
-    <ClInclude Include="src\vendor\renderdoc_app.h" />
+    <ClInclude Include="src\Util\MallocdMemory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CPU\Textures\TextureIO.cpp" />
@@ -114,6 +114,7 @@
     <ClCompile Include="src\GPU\GPUInterface.cpp" />
     <ClCompile Include="src\GPU\IM_GPUContext.cpp" />
     <ClCompile Include="src\GPU\IM_GPUInterface.cpp" />
+    <ClCompile Include="src\GPU\Textures\IM_GPUTextureStack.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

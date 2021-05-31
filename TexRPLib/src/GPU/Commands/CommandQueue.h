@@ -24,6 +24,9 @@ namespace TexRP{
 			// Pre destructor release
 			void release();
 
+			// Getters
+			ID3D12CommandQueue* ptr();
+
 			// Operator overloading
 			ID3D12CommandQueue* operator->();
 			operator ID3D12CommandQueue* ();

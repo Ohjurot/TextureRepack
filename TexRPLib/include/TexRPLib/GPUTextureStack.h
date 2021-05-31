@@ -11,7 +11,7 @@ namespace TexRPLib {
 			virtual ~IGPUTextureStack() {};
 
 			// Reset the texture stack to the defined parameters
-			virtual void reset(UINT width, UINT height, UINT bpp, UINT count) = 0;
+			virtual bool reset(UINT width, UINT height, UINT bpp, UINT count) = 0;
 
 			// Load a new texture from disk (return ID)
 			virtual UINT loadFromDisk(LPCSTR path) = 0;
