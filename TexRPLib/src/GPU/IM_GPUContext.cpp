@@ -7,6 +7,11 @@ TexRPLib::IM_GPUContext::~IM_GPUContext() {
 	m_ptrDevice.ReleaseAndGetAddressOf();
 
 	#ifdef _DEBUG
+	if (m_pixCaptureControle) {
+		m_pixCaptureControle->EndCapture();
+		m_pixCaptureControle.ReleaseAndGetAddressOf();
+	}
+
 	if (m_ptrDebugDevice) {
 		OutputDebugStringW(L"--- DirectX 12 is reporting live device objects (final destruction). Please note that one device reported is totaly normal!\n--- This device listed it that device that is producing that output\n");
 		m_ptrDebugDevice->ReportLiveDeviceObjects(D3D12_RLDO_IGNORE_INTERNAL | D3D12_RLDO_DETAIL);
@@ -25,6 +30,11 @@ bool TexRPLib::IM_GPUContext::init(IDXGIAdapter* ptrAdpter) {
 	if (FAILED(m_ptrDevice->QueryInterface(IID_PPV_ARGS(&m_ptrDebugDevice)))) {
 		return false;
 	}
+
+	// PIX
+	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&m_pixCaptureControle)))) {
+		m_pixCaptureControle->BeginCapture();
+	}
 	#endif
 
 	// Init command queue
@@ -34,6 +44,13 @@ bool TexRPLib::IM_GPUContext::init(IDXGIAdapter* ptrAdpter) {
 
 	// Init command list
 	if (!m_directCommandList.init(m_ptrDevice.Get(), m_directCommandQueue, D3D12_COMMAND_LIST_TYPE_DIRECT)) {
+		return false;
+	}
+
+	// Check for conservative rasterizer	
+	D3D12_FEATURE_DATA_D3D12_OPTIONS options;
+	ZeroMemory(&options, sizeof(D3D12_FEATURE_DATA_D3D12_OPTIONS));
+	if (FAILED(m_ptrDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(D3D12_FEATURE_DATA_D3D12_OPTIONS))) || options.ConservativeRasterizationTier == D3D12_CONSERVATIVE_RASTERIZATION_TIER_NOT_SUPPORTED) {
 		return false;
 	}
 

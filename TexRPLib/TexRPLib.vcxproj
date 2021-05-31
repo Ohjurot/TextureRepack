@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClInclude Include="include\TexRPLib\GPUContext.h" />
     <ClInclude Include="include\TexRPLib\GPUInterface.h" />
+    <ClInclude Include="include\TexRPLib\GPUTextureStack.h" />
     <ClInclude Include="include\TexRPLib\TEXRP.h" />
     <ClInclude Include="include\TexRPLib\WinInclude.h" />
     <ClInclude Include="src\CPU\Textures\TextureMeta.h" />
@@ -101,6 +102,8 @@
     <ClInclude Include="src\GPU\Commands\CommandQueue.h" />
     <ClInclude Include="src\GPU\IM_GPUContext.h" />
     <ClInclude Include="src\GPU\IM_GPUInterface.h" />
+    <ClInclude Include="src\GPU\Textures\IM_GPUTextureStack.h" />
+    <ClInclude Include="src\vendor\renderdoc_app.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CPU\Textures\TextureIO.cpp" />

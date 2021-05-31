@@ -6,6 +6,8 @@
 #include <GPU/Commands/CommandQueue.h>
 #include <GPU/Commands/CommandList.h>
 
+#include <DXProgrammableCapture.h>
+
 // DEBUG INCLUDES
 #include <CPU/Textures/TextureIO.h>
 // END DEBUG
@@ -29,6 +31,7 @@ namespace TexRPLib {
 			ComPtr<ID3D12Device> m_ptrDevice;
 			#ifdef _DEBUG
 			ComPtr<ID3D12DebugDevice> m_ptrDebugDevice;
+			ComPtr<IDXGraphicsAnalysis> m_pixCaptureControle;
 			#endif			
 
 			// Command queue for command staging

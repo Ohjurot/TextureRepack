@@ -2,6 +2,8 @@
 
 #include <TexRPLib/WinInclude.h>
 
+#include <iostream>
+
 #ifdef _DEBUG
 static ComPtr<ID3D12Debug> s_debugInterface;
 #endif

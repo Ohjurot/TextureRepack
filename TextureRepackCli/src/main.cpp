@@ -19,7 +19,8 @@ int main(int argc, char** argv) {
 	// Check support for common formats
 	DXGI_FORMAT fmts[] = {
 		DXGI_FORMAT_R8G8B8A8_UNORM,
-		DXGI_FORMAT_R16G16B16A16_UNORM
+		DXGI_FORMAT_R16G16B16A16_UNORM,
+		DXGI_FORMAT_R8_UNORM,
 	};
 	for (unsigned int i = 0; i < _countof(fmts); i++) {
 		std::wcout << L"[" << i + 1 << L"] Input: " << gpuContext->checkInputSupport(fmts[i]) << L" Output: " << gpuContext->checkOutputSupport(fmts[i]) << std::endl;
