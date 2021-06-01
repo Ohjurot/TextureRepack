@@ -21,5 +21,8 @@ namespace TexRPLib {
 
 			// Safe texture to disk
 			virtual bool safeToDisk(UINT index) = 0;
+
+			// Rename a texture
+			virtual bool rename(UINT index, LPCSTR newName) = 0;
 	};
 }

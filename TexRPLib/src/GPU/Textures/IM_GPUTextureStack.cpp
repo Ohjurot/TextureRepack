@@ -353,4 +353,17 @@ bool TexRPLib::IM_GPUTextureStack::safeToDisk(UINT index) {
 	// Pass
 	return true;
 }
+
+bool TexRPLib::IM_GPUTextureStack::rename(UINT index, LPCSTR newName) {
+	// Bound checks
+	if (index >= m_textureUsed) {
+		return false;
+	}
+	
+	// Set name
+	m_arrTexture[index].info.metaInfo.fileName = newName;
+
+	// Passed
+	return true;
+}
  

@@ -95,6 +95,7 @@
     <ClInclude Include="include\TexRPLib\GPUTextureStack.h" />
     <ClInclude Include="include\TexRPLib\TEXRP.h" />
     <ClInclude Include="include\TexRPLib\WinInclude.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\CPU\Textures\TextureMeta.h" />
     <ClInclude Include="src\CPU\Textures\TextureIO.h" />
     <ClInclude Include="src\CPU\Textures\TextureTools.h" />
@@ -115,6 +116,9 @@
     <ClCompile Include="src\GPU\IM_GPUContext.cpp" />
     <ClCompile Include="src\GPU\IM_GPUInterface.cpp" />
     <ClCompile Include="src\GPU\Textures\IM_GPUTextureStack.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TexRPLib.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

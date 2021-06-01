@@ -59,13 +59,22 @@ bool TexRPLib::IM_GPUContext::init(IDXGIAdapter* ptrAdpter) {
 	if (ptrStack->init(m_ptrDevice.Get(), &m_directCommandQueue, &m_directCommandList)) {
 		auto rrs = ptrStack->reset(2048, 2048, 32, 32);
 		auto idBoxBase = ptrStack->loadFromDisk("./3guys_Box_BaseColor.png");
-		auto idBaseRT = ptrStack->createEmpty("./3guys_BaseColor.png", idBoxBase);
 		auto idBoxHeight = ptrStack->loadFromDisk("./3guys_Box_Height.png");
 		auto idBoxMetallic = ptrStack->loadFromDisk("./3guys_Box_Metallic.png");
 		auto idBoxNormal = ptrStack->loadFromDisk("./3guys_Box_Normal.png");
 		auto idBoxRoughness = ptrStack->loadFromDisk("./3guys_Box_Roughness.png");
 
+		ptrStack->rename(idBoxBase, "./3guys_Box_BaseColor_COPY.png");
+		ptrStack->rename(idBoxHeight, "./3guys_Box_Height_COPY.png");
+		ptrStack->rename(idBoxMetallic, "./3guys_Box_Metallic_COPY.png");
+		ptrStack->rename(idBoxNormal, "./3guys_Box_Normal_COPY.png");
+		ptrStack->rename(idBoxRoughness, "./3guys_Box_Roughness_COPY.png");
+
 		ptrStack->safeToDisk(idBoxBase);
+		ptrStack->safeToDisk(idBoxHeight);
+		ptrStack->safeToDisk(idBoxMetallic);
+		ptrStack->safeToDisk(idBoxNormal);
+		ptrStack->safeToDisk(idBoxRoughness);
 	}
 	TexRPDestroy(ptrStack);
 	// END DEBUG

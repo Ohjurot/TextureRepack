@@ -57,6 +57,9 @@
     <ClInclude Include="src\Util\MallocdMemory.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GPU\GPUInterface.cpp">
@@ -86,5 +89,10 @@
     <ClCompile Include="src\GPU\Textures\IM_GPUTextureStack.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TexRPLib.rc">
+      <Filter>Ressourcendateien</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
