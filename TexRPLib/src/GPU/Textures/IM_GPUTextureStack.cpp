@@ -166,6 +166,9 @@ UINT TexRPLib::IM_GPUTextureStack::loadFromDisk(LPCSTR path) {
 		return UINT_MAX;
 	}
 
+	// Store in array
+	memcpy(&m_arrTexture[resourceIndex].info, &info, sizeof(TexRP::TEXTURE_INFO));
+
 	// Unmap texture
 	m_uploadTexture->Unmap(NULL, NULL);
 
@@ -219,13 +222,135 @@ UINT TexRPLib::IM_GPUTextureStack::loadFromDisk(LPCSTR path) {
 	return resourceIndex;
 }
 
-UINT TexRPLib::IM_GPUTextureStack::createEmpty(LPCSTR dummyPath, UINT reference)
-{
-	return 0;
+UINT TexRPLib::IM_GPUTextureStack::createEmpty(LPCSTR dummyPath, UINT reference) {
+	// Bound checks
+	if (reference >= m_textureUsed) {
+		return UINT_MAX;
+	}
+
+	// Allocate tile
+	const UINT resourceIndex = m_textureUsed++;
+
+	// Copy information
+	memcpy(&m_arrTexture[resourceIndex].info, &m_arrTexture[reference].info, sizeof(TexRP::TEXTURE_INFO));
+
+	// Set path
+	m_arrTexture[resourceIndex].info.metaInfo.fileName = dummyPath;
+
+	// Creating resource description for that
+	D3D12_RESOURCE_DESC rd;
+	ZeroMemory(&rd, sizeof(D3D12_RESOURCE_DESC));
+
+	// Describe texture
+	rd.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	rd.Alignment = 64 * 1024;
+	rd.Width = m_arrTexture[resourceIndex].info.metaInfo.width;
+	rd.Height = m_arrTexture[resourceIndex].info.metaInfo.height;
+	rd.DepthOrArraySize = 1;
+	rd.MipLevels = 1;
+	rd.Format = m_arrTexture[resourceIndex].info.targetFormat.d3dFormat;
+	rd.SampleDesc.Count = 1;
+	rd.SampleDesc.Quality = 0;
+	rd.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	rd.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	// Get size of texure
+	const UINT64 textureSize = m_device->GetResourceAllocationInfo(NULL, 1, &rd).SizeInBytes;
+
+	// Chck if heap can hold texture
+	if (textureSize > (m_heapSize - m_headHead)) {
+		return UINT_MAX;
+	}
+
+	// Create resource
+	if (FAILED(m_device->CreatePlacedResource(m_textureHeap.Get(), m_headHead, &rd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, NULL, IID_PPV_ARGS(&m_arrTexture[resourceIndex].gpuResource)))) {
+		return UINT_MAX;
+	}
+
+	// Return index
+	return resourceIndex;
 }
 
-UINT TexRPLib::IM_GPUTextureStack::safeToDisk(UINT index)
-{
-	return 0;
+bool TexRPLib::IM_GPUTextureStack::safeToDisk(UINT index) {
+	// Bound checks
+	if (index >= m_textureUsed) {
+		return false;
+	}
+
+	// Resource barrier (copy src)
+	D3D12_RESOURCE_BARRIER barrToCopySrc;
+	ZeroMemory(&barrToCopySrc, sizeof(D3D12_RESOURCE_BARRIER));
+	barrToCopySrc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrToCopySrc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrToCopySrc.Transition.pResource = m_arrTexture[index].gpuResource.Get();
+	barrToCopySrc.Transition.Subresource = NULL;
+	barrToCopySrc.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barrToCopySrc.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	// Queue on list
+	m_ptrCmdList->ptr()->ResourceBarrier(1, &barrToCopySrc);
+
+	// Copy destination
+	D3D12_TEXTURE_COPY_LOCATION copyDest;
+	ZeroMemory(&copyDest, sizeof(D3D12_TEXTURE_COPY_LOCATION));
+	copyDest.pResource = m_downloadTexture.Get();
+	copyDest.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+	copyDest.PlacedFootprint.Offset = 0;
+	copyDest.PlacedFootprint.Footprint.Width = m_arrTexture[index].info.metaInfo.width;
+	copyDest.PlacedFootprint.Footprint.Height = m_arrTexture[index].info.metaInfo.height;
+	copyDest.PlacedFootprint.Footprint.Depth = 1;
+	copyDest.PlacedFootprint.Footprint.RowPitch = m_arrTexture[index].info.metaInfo.width * ((m_arrTexture[index].info.targetFormat.bpp + 7) / 8);
+	copyDest.PlacedFootprint.Footprint.Format = m_arrTexture[index].info.targetFormat.d3dFormat;
+
+	// Copy source
+	D3D12_TEXTURE_COPY_LOCATION copySrc;
+	ZeroMemory(&copySrc, sizeof(D3D12_TEXTURE_COPY_LOCATION));
+	copySrc.pResource = m_arrTexture[index].gpuResource.Get();
+	copySrc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	copySrc.SubresourceIndex = 0;
+
+	// Copy box
+	D3D12_BOX copyBox;
+	copyBox.top = 0;
+	copyBox.left = 0;
+	copyBox.front = 0;
+	copyBox.right = m_arrTexture[index].info.metaInfo.width;
+	copyBox.bottom = m_arrTexture[index].info.metaInfo.height;
+	copyBox.back = 1;
+
+	// Queue copy on list
+	m_ptrCmdList->ptr()->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, &copyBox);
+
+	// Resource barrier (resource)
+	D3D12_RESOURCE_BARRIER barrToResource;
+	ZeroMemory(&barrToResource, sizeof(D3D12_RESOURCE_BARRIER));
+	barrToResource.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrToResource.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrToResource.Transition.pResource = m_arrTexture[index].gpuResource.Get();
+	barrToResource.Transition.Subresource = NULL;
+	barrToResource.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	barrToResource.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	// Queue on list
+	m_ptrCmdList->ptr()->ResourceBarrier(1, &barrToResource);
+
+	// Execute
+	m_ptrCmdList->close();
+	ID3D12CommandList* xArr[] = {m_ptrCmdList->ptr()};
+	m_ptrCmdQueue->dispatchSync(xArr, 1);
+	m_ptrCmdList->reset();
+
+	// Map to CPU range
+	void* cpuTexture;
+	if (FAILED(m_downloadTexture->Map(NULL, NULL, &cpuTexture))) {
+		return false;
+	}
+
+	// WIC Store
+	TexRP::TextureIO::storeTexture(m_arrTexture[index].info.metaInfo, m_arrTexture[index].info.targetFormat, m_arrTexture[index].info.sourceFormat, cpuTexture, m_arrTexture[index].info.metaInfo.width * m_arrTexture[index].info.metaInfo.height * ((m_arrTexture[index].info.targetFormat.bpp + 7) / 8));
+
+	// Unmap
+	m_downloadTexture->Unmap(NULL, NULL);
+
+	// Pass
+	return true;
 }
  

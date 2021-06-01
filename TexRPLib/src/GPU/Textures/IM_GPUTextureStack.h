@@ -26,7 +26,7 @@ namespace TexRPLib {
 			bool reset(UINT width, UINT height, UINT bpp, UINT count) override;
 			UINT loadFromDisk(LPCSTR path) override;
 			UINT createEmpty(LPCSTR dummyPath, UINT reference) override;
-			UINT safeToDisk(UINT index) override;
+			bool safeToDisk(UINT index) override;
 
 		private:
 			// Defines a texture in the stack

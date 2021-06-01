@@ -20,6 +20,6 @@ namespace TexRPLib {
 			virtual UINT createEmpty(LPCSTR dummyPath, UINT reference) = 0;
 
 			// Safe texture to disk
-			virtual UINT safeToDisk(UINT index) = 0;
+			virtual bool safeToDisk(UINT index) = 0;
 	};
 }
