@@ -60,6 +60,12 @@
     <ClInclude Include="resource.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="include\TexRPLib\GPUGeometryModell.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GPU\IM_GPUGeometryModell.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GPU\GPUInterface.cpp">
@@ -87,6 +93,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\GPU\Textures\IM_GPUTextureStack.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPU\IM_GPUGeometryModell.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

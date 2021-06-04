@@ -6,11 +6,13 @@
 #include <GPU/Commands/CommandQueue.h>
 #include <GPU/Commands/CommandList.h>
 
+#include <GPU/Textures/IM_GPUTextureStack.h>
+#include <GPU/IM_GPUGeometryModell.h>
+
 #include <DXProgrammableCapture.h>
 
 // DEBUG INCLUDES
-#include <CPU/Textures/TextureIO.h>
-#include <GPU/Textures/IM_GPUTextureStack.h>
+
 // END DEBUG
 
 namespace TexRPLib {
@@ -26,6 +28,8 @@ namespace TexRPLib {
 			// Implement interface 
 			bool checkInputSupport(DXGI_FORMAT format) override;
 			bool checkOutputSupport(DXGI_FORMAT format) override;
+			TexRPLib::IGPUTextureStack* createTextureStack() override;
+			TexRPLib::IGPUGeometryModell* openModell(LPCSTR modellPath) override;
 
 		private:
 			// Main DirectX Device

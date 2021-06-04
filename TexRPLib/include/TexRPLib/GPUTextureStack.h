@@ -2,7 +2,6 @@
 
 #include <TexRPLib/TEXRP.h>
 #include <TexRPLib/WinInclude.h>
-#include <TexRPLib/GPUContext.h>
 
 namespace TexRPLib {
 	class IGPUTextureStack {

@@ -1,7 +1,7 @@
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
-#define NO_MIN_MAX
+#define NOMINMAX
 
 #include <Windows.h>
 #include <wrl.h>

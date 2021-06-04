@@ -1,6 +1,8 @@
 #pragma once
 
 #include <TexRPLib/WinInclude.h>
+#include <TexRPLib/GPUTextureStack.h>
+#include <TexRPLib/GPUGeometryModell.h>
 
 namespace TexRPLib {
 	class IGPUContext {
@@ -13,5 +15,11 @@ namespace TexRPLib {
 
 			// Check if the format is supported as output format (render target)
 			virtual bool checkOutputSupport(DXGI_FORMAT format) = 0;
+
+			// Create a gpu texture stack
+			virtual TexRPLib::IGPUTextureStack* createTextureStack() = 0;
+
+			// Opening a modell file from disk
+			virtual TexRPLib::IGPUGeometryModell* openModell(LPCSTR modellPath) = 0;
 	};
 }

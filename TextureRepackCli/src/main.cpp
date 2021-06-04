@@ -26,8 +26,21 @@ int main(int argc, char** argv) {
 		std::wcout << L"[" << i + 1 << L"] Input: " << gpuContext->checkInputSupport(fmts[i]) << L" Output: " << gpuContext->checkOutputSupport(fmts[i]) << std::endl;
 	}
 
-	
+	// Allocate texture stack
+	TexRPLib::IGPUTextureStack* ptrStack = gpuContext->createTextureStack();
+	ptrStack->reset(2048, 2048, 32, 32);
+
+	// Test loading and saving a texture
+	auto tid = ptrStack->loadFromDisk("./3guys_Box_BaseColor.png");
+	ptrStack->rename(tid, "./color_copy.png");
+	ptrStack->safeToDisk(tid);
+
+	// Test loading a modell
+	TexRPLib::IGPUGeometryModell* ptrModell = gpuContext->openModell("./3guys.fbx");
+
 	// Cleanup
+	TexRPDestroy(ptrModell);
+	TexRPDestroy(ptrStack);
 	TexRPDestroy(gpuContext);
 	TexRPDestroy(gpuInterface);
 

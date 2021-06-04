@@ -47,15 +47,15 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\obj\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)\vendor\assimp\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\vendor\assimp\bin\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)vendor\assimp\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)vendor\assimp\bin\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\obj\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)\vendor\assimp\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\vendor\assimp\bin\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)vendor\assimp\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)vendor\assimp\bin\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -70,6 +70,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)vendor\assimp\bin\assimp-vc142-mtd.dll $(TargetDir) /y /q</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -88,9 +91,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)vendor\assimp\bin\assimp-vc142-mt.dll $(TargetDir) /y /q</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\TexRPLib\GPUContext.h" />
+    <ClInclude Include="include\TexRPLib\GPUGeometryModell.h" />
     <ClInclude Include="include\TexRPLib\GPUInterface.h" />
     <ClInclude Include="include\TexRPLib\GPUTextureStack.h" />
     <ClInclude Include="include\TexRPLib\TEXRP.h" />
@@ -102,6 +109,7 @@
     <ClInclude Include="src\GPU\Commands\CommandList.h" />
     <ClInclude Include="src\GPU\Commands\CommandQueue.h" />
     <ClInclude Include="src\GPU\IM_GPUContext.h" />
+    <ClInclude Include="src\GPU\IM_GPUGeometryModell.h" />
     <ClInclude Include="src\GPU\IM_GPUInterface.h" />
     <ClInclude Include="src\GPU\Textures\IM_GPUTextureStack.h" />
     <ClInclude Include="src\Util\MallocdMemory.h" />
@@ -114,6 +122,7 @@
     <ClCompile Include="src\GPU\Commands\CommandQueue.cpp" />
     <ClCompile Include="src\GPU\GPUInterface.cpp" />
     <ClCompile Include="src\GPU\IM_GPUContext.cpp" />
+    <ClCompile Include="src\GPU\IM_GPUGeometryModell.cpp" />
     <ClCompile Include="src\GPU\IM_GPUInterface.cpp" />
     <ClCompile Include="src\GPU\Textures\IM_GPUTextureStack.cpp" />
   </ItemGroup>

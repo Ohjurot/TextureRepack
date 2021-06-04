@@ -55,28 +55,7 @@ bool TexRPLib::IM_GPUContext::init(IDXGIAdapter* ptrAdpter) {
 	}
 
 	// DEBUG VERY VERY DIRTY TO DO THAT HERE BUT DLL DOES NOT EXPOSE ALL REQUIRED CLASSES TO TEST THIS DURING DEVELOPMENT
-	TexRPLib::IM_GPUTextureStack* ptrStack = TexRPAllocate(TexRPLib::IM_GPUTextureStack, TexRPLib::IM_GPUTextureStack);
-	if (ptrStack->init(m_ptrDevice.Get(), &m_directCommandQueue, &m_directCommandList)) {
-		auto rrs = ptrStack->reset(2048, 2048, 32, 32);
-		auto idBoxBase = ptrStack->loadFromDisk("./3guys_Box_BaseColor.png");
-		auto idBoxHeight = ptrStack->loadFromDisk("./3guys_Box_Height.png");
-		auto idBoxMetallic = ptrStack->loadFromDisk("./3guys_Box_Metallic.png");
-		auto idBoxNormal = ptrStack->loadFromDisk("./3guys_Box_Normal.png");
-		auto idBoxRoughness = ptrStack->loadFromDisk("./3guys_Box_Roughness.png");
-
-		ptrStack->rename(idBoxBase, "./3guys_Box_BaseColor_COPY.png");
-		ptrStack->rename(idBoxHeight, "./3guys_Box_Height_COPY.png");
-		ptrStack->rename(idBoxMetallic, "./3guys_Box_Metallic_COPY.png");
-		ptrStack->rename(idBoxNormal, "./3guys_Box_Normal_COPY.png");
-		ptrStack->rename(idBoxRoughness, "./3guys_Box_Roughness_COPY.png");
-
-		ptrStack->safeToDisk(idBoxBase);
-		ptrStack->safeToDisk(idBoxHeight);
-		ptrStack->safeToDisk(idBoxMetallic);
-		ptrStack->safeToDisk(idBoxNormal);
-		ptrStack->safeToDisk(idBoxRoughness);
-	}
-	TexRPDestroy(ptrStack);
+	
 	// END DEBUG
 
 	// Passed
@@ -109,4 +88,28 @@ bool TexRPLib::IM_GPUContext::checkOutputSupport(DXGI_FORMAT format) {
 
 	// Fallback
 	return false;
+}
+
+TexRPLib::IGPUTextureStack* TexRPLib::IM_GPUContext::createTextureStack() {
+	// Allocate texture stack
+	TexRPLib::IM_GPUTextureStack* ptrGpuTextureStack = TexRPAllocate(IM_GPUTextureStack, IM_GPUTextureStack);
+	if (ptrGpuTextureStack->init(m_ptrDevice.Get(), &m_directCommandQueue, &m_directCommandList)) {
+		return ptrGpuTextureStack;
+	}
+
+	// Deallocate
+	TexRPDestroy(ptrGpuTextureStack);
+	return nullptr;
+}
+
+TexRPLib::IGPUGeometryModell* TexRPLib::IM_GPUContext::openModell(LPCSTR modellPath) {
+	// Allocate texture stack
+	TexRPLib::IM_GPUGeometryModell* ptrGpuModell = TexRPAllocate(IM_GPUGeometryModell, IM_GPUGeometryModell);
+	if (ptrGpuModell->init(m_ptrDevice.Get(), &m_directCommandList, &m_directCommandQueue, modellPath)) {
+		return ptrGpuModell;
+	}
+
+	// Deallocate
+	TexRPDestroy(ptrGpuModell);
+	return nullptr;
 }
