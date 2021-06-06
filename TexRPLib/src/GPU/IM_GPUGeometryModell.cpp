@@ -304,6 +304,9 @@ TexRPLib::IGPUMask* TexRPLib::IM_GPUGeometryModell::createMask(UINT index, UINT 
 			// Draw
 			m_ptrCommandList->ptr()->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
 
+			// Reset resourcestate
+			ptrMask->setSRVState(*m_ptrCommandList);
+
 			// Queue execute sync
 			m_ptrCommandList->close();
 			ID3D12CommandList* execArray[] = { *m_ptrCommandList };

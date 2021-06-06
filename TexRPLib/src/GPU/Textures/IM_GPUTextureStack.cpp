@@ -39,6 +39,9 @@ bool TexRPLib::IM_GPUTextureStack::setRenderTarget(UINT index, ID3D12GraphicsCom
 		return false;
 	}
 
+	// Create RTV Description
+	auto rtvHandle = m_descriptorHeapRTV->GetCPUDescriptorHandleForHeapStart();
+
 	// Check state
 	if (m_arrTexture[index].currentState != D3D12_RESOURCE_STATE_RENDER_TARGET) {
 		// Barrier
@@ -51,18 +54,20 @@ bool TexRPLib::IM_GPUTextureStack::setRenderTarget(UINT index, ID3D12GraphicsCom
 		barr.Transition.StateBefore = m_arrTexture[index].currentState;
 		barr.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
+		// Queue barrier
+		ptrCommandList->ResourceBarrier(1, &barr);
+
 		// Set current state
 		m_arrTexture[index].currentState = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	}
 
-	// Create RTV Description
-	auto rtvHandle = m_descriptorHeapRTV->GetCPUDescriptorHandleForHeapStart();
+	// Create RTV
 	m_device->CreateRenderTargetView(m_arrTexture[index].gpuResource.Get(), NULL, rtvHandle);
 
 	// Check if clear was requested
 	if (m_arrTexture[index].shouldClear) {
 		// Clear to black
-		static float clearColor[] = {0.0f, 0.0f, 0.0f, 0.0f};
+		static float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		ptrCommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, NULL);
 
 		// Unset flag
@@ -84,9 +89,8 @@ bool TexRPLib::IM_GPUTextureStack::setRenderTarget(UINT index, ID3D12GraphicsCom
 	return true;
 }
 
-bool TexRPLib::IM_GPUTextureStack::setShaderResourceViews(UINT* arrInicies, UINT numIndicies, D3D12_GPU_DESCRIPTOR_HANDLE* ptrOutputHandle) {
+bool TexRPLib::IM_GPUTextureStack::setShaderResourceViews(UINT* arrInicies, UINT numIndicies, D3D12_CPU_DESCRIPTOR_HANDLE srvHandle) {
 	const auto handleIncrementStepSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = m_descriptorHeapSRV->GetCPUDescriptorHandleForHeapStart();
 
 	// For each index
 	for (unsigned int i = 0; i < numIndicies; i++) {
@@ -101,9 +105,6 @@ bool TexRPLib::IM_GPUTextureStack::setShaderResourceViews(UINT* arrInicies, UINT
 		// Increment handle
 		srvHandle.ptr += handleIncrementStepSize;
 	}
-
-	// Set handle to first heap element
-	*ptrOutputHandle = m_descriptorHeapSRV->GetGPUDescriptorHandleForHeapStart();
 
 	// Pass
 	return true;
@@ -139,7 +140,7 @@ bool TexRPLib::IM_GPUTextureStack::reset(UINT width, UINT height, UINT bpp, UINT
 	ZeroMemory(&sdhd, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
 	sdhd.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	sdhd.NumDescriptors = count;
-	sdhd.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	sdhd.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	sdhd.NodeMask = NULL;
 
 	// Create SRV descriptor heap
@@ -235,7 +236,16 @@ UINT TexRPLib::IM_GPUTextureStack::loadFromDisk(LPCSTR path) {
 	rd.SampleDesc.Count = 1;
 	rd.SampleDesc.Quality = 0;
 	rd.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	rd.Flags = D3D12_RESOURCE_FLAG_NONE;
+	rd.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	// Describe clear value
+	D3D12_CLEAR_VALUE clearValue;
+	ZeroMemory(&clearValue, sizeof(D3D12_CLEAR_VALUE));
+	clearValue.Format = info.targetFormat.d3dFormat;
+	clearValue.Color[0] = 0.0f;
+	clearValue.Color[1] = 0.0f;
+	clearValue.Color[2] = 0.0f;
+	clearValue.Color[3] = 0.0f;
 
 	// Get size of texure
 	const UINT64 textureSize = m_device->GetResourceAllocationInfo(NULL, 1, &rd).SizeInBytes;
@@ -252,7 +262,7 @@ UINT TexRPLib::IM_GPUTextureStack::loadFromDisk(LPCSTR path) {
 	// Create actual texure
 	if (FAILED(m_device->CreatePlacedResource(
 		m_textureHeap.Get(), m_headHead,
-		&rd, D3D12_RESOURCE_STATE_COPY_DEST, NULL,
+		&rd, D3D12_RESOURCE_STATE_COPY_DEST, &clearValue,
 		IID_PPV_ARGS(&m_arrTexture[resourceIndex].gpuResource)
 	))) {
 		return UINT_MAX;
@@ -362,7 +372,16 @@ UINT TexRPLib::IM_GPUTextureStack::createEmpty(LPCSTR dummyPath, UINT reference)
 	rd.SampleDesc.Count = 1;
 	rd.SampleDesc.Quality = 0;
 	rd.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	rd.Flags = D3D12_RESOURCE_FLAG_NONE;
+	rd.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	// Describe clear value
+	D3D12_CLEAR_VALUE clearValue;
+	ZeroMemory(&clearValue, sizeof(D3D12_CLEAR_VALUE));
+	clearValue.Format = m_arrTexture[resourceIndex].info.targetFormat.d3dFormat;
+	clearValue.Color[0] = 0.0f;
+	clearValue.Color[1] = 0.0f;
+	clearValue.Color[2] = 0.0f;
+	clearValue.Color[3] = 0.0f;
 
 	// Get size of texure
 	const UINT64 textureSize = m_device->GetResourceAllocationInfo(NULL, 1, &rd).SizeInBytes;
@@ -373,7 +392,7 @@ UINT TexRPLib::IM_GPUTextureStack::createEmpty(LPCSTR dummyPath, UINT reference)
 	}
 
 	// Create resource
-	if (FAILED(m_device->CreatePlacedResource(m_textureHeap.Get(), m_headHead, &rd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, NULL, IID_PPV_ARGS(&m_arrTexture[resourceIndex].gpuResource)))) {
+	if (FAILED(m_device->CreatePlacedResource(m_textureHeap.Get(), m_headHead, &rd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&m_arrTexture[resourceIndex].gpuResource)))) {
 		return UINT_MAX;
 	}
 
@@ -391,17 +410,23 @@ bool TexRPLib::IM_GPUTextureStack::safeToDisk(UINT index) {
 		return false;
 	}
 
-	// Resource barrier (copy src)
-	D3D12_RESOURCE_BARRIER barrToCopySrc;
-	ZeroMemory(&barrToCopySrc, sizeof(D3D12_RESOURCE_BARRIER));
-	barrToCopySrc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrToCopySrc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrToCopySrc.Transition.pResource = m_arrTexture[index].gpuResource.Get();
-	barrToCopySrc.Transition.Subresource = NULL;
-	barrToCopySrc.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrToCopySrc.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
-	// Queue on list
-	m_ptrCmdList->ptr()->ResourceBarrier(1, &barrToCopySrc);
+	if (m_arrTexture[index].currentState != D3D12_RESOURCE_STATE_COPY_SOURCE) {
+		// Resource barrier (copy src)
+		D3D12_RESOURCE_BARRIER barrToCopySrc;
+		ZeroMemory(&barrToCopySrc, sizeof(D3D12_RESOURCE_BARRIER));
+		barrToCopySrc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrToCopySrc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrToCopySrc.Transition.pResource = m_arrTexture[index].gpuResource.Get();
+		barrToCopySrc.Transition.Subresource = NULL;
+		barrToCopySrc.Transition.StateBefore = m_arrTexture[index].currentState;
+		barrToCopySrc.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+		
+		// Queue on list
+		m_ptrCmdList->ptr()->ResourceBarrier(1, &barrToCopySrc);
+
+		// Set state
+		m_arrTexture[index].currentState = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	}
 
 	// Copy destination
 	D3D12_TEXTURE_COPY_LOCATION copyDest;
@@ -433,18 +458,6 @@ bool TexRPLib::IM_GPUTextureStack::safeToDisk(UINT index) {
 
 	// Queue copy on list
 	m_ptrCmdList->ptr()->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, &copyBox);
-
-	// Resource barrier (resource)
-	D3D12_RESOURCE_BARRIER barrToResource;
-	ZeroMemory(&barrToResource, sizeof(D3D12_RESOURCE_BARRIER));
-	barrToResource.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrToResource.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrToResource.Transition.pResource = m_arrTexture[index].gpuResource.Get();
-	barrToResource.Transition.Subresource = NULL;
-	barrToResource.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
-	barrToResource.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	// Queue on list
-	m_ptrCmdList->ptr()->ResourceBarrier(1, &barrToResource);
 
 	// Execute
 	m_ptrCmdList->close();

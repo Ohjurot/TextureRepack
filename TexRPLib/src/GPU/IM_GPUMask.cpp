@@ -40,10 +40,10 @@ bool TexRPLib::IM_GPUMask::init(ID3D12Device* ptrDevice, UINT sideLength) {
 	clearValue.Color[3] = 0.0f;
 
 	// Create resource
-	if (FAILED(ptrDevice->CreateCommittedResource(&hp, D3D12_HEAP_FLAG_NONE, &rd, D3D12_RESOURCE_STATE_RENDER_TARGET, &clearValue, IID_PPV_ARGS(&m_ptrMaskResource)))) {
+	if (FAILED(ptrDevice->CreateCommittedResource(&hp, D3D12_HEAP_FLAG_NONE, &rd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&m_ptrMaskResource)))) {
 		return false;
 	}
-	m_currentState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	m_currentState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
 	// Describe descritor heap
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDhd;
@@ -108,6 +108,31 @@ void TexRPLib::IM_GPUMask::bindAsRTV(ID3D12GraphicsCommandList* ptrCommandList) 
 	// Set siccor rect
 	const D3D12_RECT sr = {0, 0, m_sideLength, m_sideLength };
 	ptrCommandList->RSSetScissorRects(1, &sr);
+}
+
+void TexRPLib::IM_GPUMask::setSRVState(ID3D12GraphicsCommandList* ptrCommandList) {
+	// Check for state change
+	if (m_currentState != D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE) {
+		// Resource barrier
+		D3D12_RESOURCE_BARRIER barr;
+		ZeroMemory(&barr, sizeof(D3D12_RESOURCE_BARRIER));
+		barr.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barr.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barr.Transition.pResource = m_ptrMaskResource.Get();
+		barr.Transition.Subresource = NULL;
+		barr.Transition.StateBefore = m_currentState;
+		barr.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+		// Queue barrier
+		ptrCommandList->ResourceBarrier(1, &barr);
+
+		// Update state
+		m_currentState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	}
+}
+
+ID3D12Resource* TexRPLib::IM_GPUMask::res() {
+	return m_ptrMaskResource.Get();
 }
 
 void TexRPLib::IM_GPUMask::clear() {

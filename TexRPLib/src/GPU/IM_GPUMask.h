@@ -17,11 +17,12 @@ namespace TexRPLib {
 			// Init function
 			bool init(ID3D12Device* ptrDevice, UINT sideLength);
 
-			// Functions
 			// Bind the mask as a srv resource
 			void bindAsRTV(ID3D12GraphicsCommandList* ptrCommandList);
-			// TODO: Retriver SRV handle
-
+			// Bring state to SRV
+			void setSRVState(ID3D12GraphicsCommandList* ptrCommandList);
+			// Get resource pointer
+			ID3D12Resource* res();
 
 			// Implement interface
 			void clear();

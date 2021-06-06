@@ -3,6 +3,7 @@
 TexRPLib::IM_GPUContext::~IM_GPUContext() {
 	// Release pass
 	m_maskPass.release();
+	m_mergePass.release();
 	
 	// Release mebers
 	m_directCommandList.release();
@@ -62,9 +63,10 @@ bool TexRPLib::IM_GPUContext::init(IDXGIAdapter* ptrAdpter) {
 		return false;
 	}
 
-	// DEBUG VERY VERY DIRTY TO DO THAT HERE BUT DLL DOES NOT EXPOSE ALL REQUIRED CLASSES TO TEST THIS DURING DEVELOPMENT
-	
-	// END DEBUG
+	// Init merge pass
+	if (!m_mergePass.init(m_ptrDevice.Get(), &m_directCommandQueue, &m_directCommandList)) {
+		return false;
+	}
 
 	// Passed
 	return true;
@@ -120,4 +122,64 @@ TexRPLib::IGPUGeometryModell* TexRPLib::IM_GPUContext::openModell(LPCSTR modellP
 	// Deallocate
 	TexRPDestroy(ptrGpuModell);
 	return nullptr;
+}
+
+bool TexRPLib::IM_GPUContext::mergTextures(TexRPLib::IGPUMask** arrMasks, TexRPLib::IGPUTextureStack* ptrTextureStack, UINT outputIndex, UINT mergCount, UINT* arrSourceIndices) {
+	// Cast to implementation pointers
+	IM_GPUTextureStack* ptrTextureStackIM = (IM_GPUTextureStack*)ptrTextureStack;
+
+	// TODO: Validate
+
+	// Describe descriptor heap
+	D3D12_DESCRIPTOR_HEAP_DESC dhd;
+	ZeroMemory(&dhd, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
+	dhd.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	dhd.NumDescriptors = mergCount * 2;
+	dhd.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	dhd.NodeMask = NULL;
+
+	// create descriptor heap
+	ComPtr<ID3D12DescriptorHeap> srvHeap;
+	if (FAILED(m_ptrDevice->CreateDescriptorHeap(&dhd, IID_PPV_ARGS(&srvHeap)))) {
+		return false;
+	}
+
+	// Heap increment
+	auto heapIncrmentSize = m_ptrDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	// Bind heap
+	ID3D12DescriptorHeap* heaps[] = {srvHeap.Get()};
+	m_directCommandList->SetDescriptorHeaps(1, heaps);
+
+	// Bind state
+	m_mergePass.bind(m_directCommandList);
+	ptrTextureStackIM->setRenderTarget(outputIndex, m_directCommandList);
+	
+	// Prepare texture srvs
+	ptrTextureStackIM->setShaderResourceViews(arrSourceIndices, mergCount, srvHeap->GetCPUDescriptorHandleForHeapStart());
+	
+	// Prepare mask srvs
+	for (UINT i = 0; i < mergCount; i++) {
+		// Get handle
+		D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = { srvHeap->GetCPUDescriptorHandleForHeapStart().ptr + ((mergCount + i) * heapIncrmentSize) };
+
+		// Create SRV
+		m_ptrDevice->CreateShaderResourceView(((IM_GPUMask*)arrMasks[i])->res(), NULL, srvHandle);
+	}
+	
+	// SRV Binding
+	m_directCommandList->SetGraphicsRootDescriptorTable(1, srvHeap->GetGPUDescriptorHandleForHeapStart());
+	m_directCommandList->SetGraphicsRootDescriptorTable(0, { srvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (mergCount * heapIncrmentSize)});
+
+	// Draw
+	m_directCommandList->DrawInstanced(4, mergCount, 0, 0);
+
+	// Exeute
+	m_directCommandList.close();
+	ID3D12CommandList* executeArray[] = { m_directCommandList };
+	m_directCommandQueue.dispatchSync(executeArray, 1);
+	m_directCommandList.reset();
+
+	// Pass
+	return true;
 }

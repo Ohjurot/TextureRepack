@@ -81,6 +81,9 @@
     <ClInclude Include="src\GPU\IM_GPUMask.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\GPU\Passes\MergeRenderPass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GPU\GPUInterface.cpp">
@@ -122,6 +125,9 @@
     <ClCompile Include="src\GPU\IM_GPUMask.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPU\Passes\MergeRenderPass.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TexRPLib.rc">
@@ -132,5 +138,8 @@
     <FxCompile Include="src\Shader\MaskPass_VS.hlsl" />
     <FxCompile Include="src\Shader\MaskPass_PS.hlsl" />
     <FxCompile Include="src\Shader\MaskPass_RS.hlsl" />
+    <FxCompile Include="src\Shader\MergePass_RS.hlsl" />
+    <FxCompile Include="src\Shader\MergePass_VS.hlsl" />
+    <FxCompile Include="src\Shader\MergePass_PS.hlsl" />
   </ItemGroup>
 </Project>

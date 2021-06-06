@@ -31,19 +31,31 @@ int main(int argc, char** argv) {
 	ptrStack->reset(2048, 2048, 32, 32);
 
 	// Test loading and saving a texture
-	auto tid = ptrStack->loadFromDisk("./3guys_Box_BaseColor.png");
-	ptrStack->rename(tid, "./color_copy.png");
-	ptrStack->safeToDisk(tid);
+	auto t01 = ptrStack->loadFromDisk("./3guys_Box_BaseColor.png");
+	auto t02 = ptrStack->loadFromDisk("./3guys_Sphere_BaseColor.png");
+	auto t03 = ptrStack->loadFromDisk("./3guys_Torus_BaseColor.png");
+	auto tres = ptrStack->createEmpty("./3guys_BaseColor.png", t01);
 
 	// Test loading a modell
 	TexRPLib::IGPUGeometryModell* ptrModell = gpuContext->openModell("./3guys.fbx");
 
 	// Create a mask
-	TexRPLib::IGPUMask* ptrMask = ptrModell->createMask(2, 2048);
+	TexRPLib::IGPUMask* ptrMask01 = ptrModell->createMask(0, 2048);
+	TexRPLib::IGPUMask* ptrMask02 = ptrModell->createMask(1, 2048);
+	TexRPLib::IGPUMask* ptrMask03 = ptrModell->createMask(2, 2048);
 
+	// Merge
+	UINT input[] = {t01, t02, t03};
+	TexRPLib::IGPUMask* masks[] = { ptrMask01, ptrMask02, ptrMask03 };
+	gpuContext->mergTextures(masks, ptrStack, tres, 3, input);
+
+	// Download final texture
+	ptrStack->safeToDisk(tres);
 
 	// Cleanup
-	TexRPDestroy(ptrMask);
+	TexRPDestroy(ptrMask01);
+	TexRPDestroy(ptrMask02);
+	TexRPDestroy(ptrMask03);
 	TexRPDestroy(ptrModell);
 	TexRPDestroy(ptrStack);
 	TexRPDestroy(gpuContext);

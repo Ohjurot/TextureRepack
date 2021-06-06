@@ -21,5 +21,8 @@ namespace TexRPLib {
 
 			// Opening a modell file from disk
 			virtual TexRPLib::IGPUGeometryModell* openModell(LPCSTR modellPath) = 0;
+
+			// Merg textures
+			virtual bool mergTextures(TexRPLib::IGPUMask** arrMasks, TexRPLib::IGPUTextureStack* ptrTextureStack, UINT outputIndex, UINT mergCount, UINT* arrSourceIndices) = 0;
 	};
 }

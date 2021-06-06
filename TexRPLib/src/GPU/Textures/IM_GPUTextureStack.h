@@ -24,8 +24,8 @@ namespace TexRPLib {
 
 			// Set the selected texture as render target
 			bool setRenderTarget(UINT index, ID3D12GraphicsCommandList* ptrCommandList);
-			// Set shader resource views (and retrive handle to first view)
-			bool setShaderResourceViews(UINT* arrInicies, UINT numIndicies, D3D12_GPU_DESCRIPTOR_HANDLE* ptrOutputHandle);
+			// Set shader resource views
+			bool setShaderResourceViews(UINT* arrInicies, UINT numIndicies, D3D12_CPU_DESCRIPTOR_HANDLE srvHandle);
 
 			// Implement interface 
 			bool reset(UINT width, UINT height, UINT bpp, UINT count) override;

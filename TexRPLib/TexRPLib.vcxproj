@@ -115,6 +115,7 @@
     <ClInclude Include="src\GPU\IM_GPUMask.h" />
     <ClInclude Include="src\GPU\Passes\IPass.h" />
     <ClInclude Include="src\GPU\Passes\MaskRenderPass.h" />
+    <ClInclude Include="src\GPU\Passes\MergeRenderPass.h" />
     <ClInclude Include="src\GPU\State\GPUShader.h" />
     <ClInclude Include="src\GPU\Textures\IM_GPUTextureStack.h" />
     <ClInclude Include="src\Util\MallocdMemory.h" />
@@ -131,6 +132,7 @@
     <ClCompile Include="src\GPU\IM_GPUInterface.cpp" />
     <ClCompile Include="src\GPU\IM_GPUMask.cpp" />
     <ClCompile Include="src\GPU\Passes\MaskRenderPass.cpp" />
+    <ClCompile Include="src\GPU\Passes\MergeRenderPass.cpp" />
     <ClCompile Include="src\GPU\State\GPUShader.cpp" />
     <ClCompile Include="src\GPU\Textures\IM_GPUTextureStack.cpp" />
   </ItemGroup>
@@ -161,6 +163,28 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs_main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs_main</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="src\Shader\MergePass_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+      <EnableUnboundedDescriptorTables Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</EnableUnboundedDescriptorTables>
+      <EnableUnboundedDescriptorTables Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</EnableUnboundedDescriptorTables>
+    </FxCompile>
+    <FxCompile Include="src\Shader\MergePass_RS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RootSignature</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RootSignature</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MERGEPASS_RS</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">rootsig_1.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MERGEPASS_RS</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">rootsig_1.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Shader\MergePass_VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

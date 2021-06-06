@@ -12,6 +12,7 @@
 #include <DXProgrammableCapture.h>
 
 #include <GPU/Passes/MaskRenderPass.h>
+#include <GPU/Passes/MergeRenderPass.h>
 
 // DEBUG INCLUDES
 
@@ -32,6 +33,8 @@ namespace TexRPLib {
 			bool checkOutputSupport(DXGI_FORMAT format) override;
 			TexRPLib::IGPUTextureStack* createTextureStack() override;
 			TexRPLib::IGPUGeometryModell* openModell(LPCSTR modellPath) override;
+			bool mergTextures(TexRPLib::IGPUMask** arrMasks, TexRPLib::IGPUTextureStack* ptrTextureStack, UINT outputIndex, UINT mergCount, UINT* arrSourceIndices) override;
+
 
 		private:
 			// Main DirectX Device
@@ -49,5 +52,6 @@ namespace TexRPLib {
 
 			// Render passes
 			TexRP::Passes::MaskRenderPass m_maskPass;
+			TexRP::Passes::MergeRenderPass m_mergePass;
 	};
 }
