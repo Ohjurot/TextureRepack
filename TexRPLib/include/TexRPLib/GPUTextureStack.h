@@ -18,6 +18,9 @@ namespace TexRPLib {
 			// Create empty texture (width dummy path and reference texture for format)
 			virtual UINT createEmpty(LPCSTR dummyPath, UINT reference) = 0;
 
+			// Clears a texture (Will be cleared bevore next use - no direct clear)
+			virtual bool clearTexture(UINT index) = 0;
+
 			// Safe texture to disk
 			virtual bool safeToDisk(UINT index) = 0;
 

@@ -11,6 +11,8 @@
 
 #include <DXProgrammableCapture.h>
 
+#include <GPU/Passes/MaskRenderPass.h>
+
 // DEBUG INCLUDES
 
 // END DEBUG
@@ -44,5 +46,8 @@ namespace TexRPLib {
 
 			// Command list for recording commands on the gpu
 			TexRP::GPUCommandList m_directCommandList;
+
+			// Render passes
+			TexRP::Passes::MaskRenderPass m_maskPass;
 	};
 }

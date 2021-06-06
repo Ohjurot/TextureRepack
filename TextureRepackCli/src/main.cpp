@@ -38,7 +38,12 @@ int main(int argc, char** argv) {
 	// Test loading a modell
 	TexRPLib::IGPUGeometryModell* ptrModell = gpuContext->openModell("./3guys.fbx");
 
+	// Create a mask
+	TexRPLib::IGPUMask* ptrMask = ptrModell->createMask(2, 2048);
+
+
 	// Cleanup
+	TexRPDestroy(ptrMask);
 	TexRPDestroy(ptrModell);
 	TexRPDestroy(ptrStack);
 	TexRPDestroy(gpuContext);

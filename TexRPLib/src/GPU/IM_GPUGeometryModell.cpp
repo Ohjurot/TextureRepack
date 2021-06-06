@@ -4,7 +4,13 @@ TexRPLib::IM_GPUGeometryModell::~IM_GPUGeometryModell() {
 
 }
 
-bool TexRPLib::IM_GPUGeometryModell::init(ID3D12Device* ptrDevice, TexRP::GPUCommandList* ptrCommandList, TexRP::GPUCommandQueue* ptrCommandQueue, LPCSTR modellPath) {
+bool TexRPLib::IM_GPUGeometryModell::init(ID3D12Device* ptrDevice, TexRP::GPUCommandList* ptrCommandList, TexRP::GPUCommandQueue* ptrCommandQueue, LPCSTR modellPath, TexRP::Passes::MaskRenderPass* ptrMaskPass) {
+	// Store
+	m_ptrDevice = ptrDevice;
+	m_ptrCommandList = ptrCommandList;
+	m_ptrCommandQueue = ptrCommandQueue;
+	m_ptrMaskPass = ptrMaskPass;
+
 	// Load modell
 	Assimp::Importer importer;
 	const aiScene* ptrScene = importer.ReadFile(modellPath, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
@@ -215,6 +221,29 @@ bool TexRPLib::IM_GPUGeometryModell::init(ID3D12Device* ptrDevice, TexRP::GPUCom
 	return true;
 }
 
+bool TexRPLib::IM_GPUGeometryModell::createViews(UINT index, D3D12_VERTEX_BUFFER_VIEW* ptrVertexBufferView, D3D12_INDEX_BUFFER_VIEW* ptrIndexBufferView, UINT64* ptrIndexCount) {
+	// Bound check
+	if (index >= m_meshCount) {
+		return false;
+	}
+
+	// Create VB View
+	ptrVertexBufferView->BufferLocation = m_ptrVertexBuffer->GetGPUVirtualAddress() + m_meshInfos[index].vertexOffset;
+	ptrVertexBufferView->SizeInBytes = m_meshInfos[index].vertexCount * sizeof(float) * 2;
+	ptrVertexBufferView->StrideInBytes = sizeof(float) * 2;
+
+	// Create IB View
+	ptrIndexBufferView->BufferLocation = m_ptrIndexBuffer->GetGPUVirtualAddress() + m_meshInfos[index].indexOffset;
+	ptrIndexBufferView->Format = DXGI_FORMAT_R32_UINT;
+	ptrIndexBufferView->SizeInBytes = sizeof(unsigned int) * m_meshInfos[index].indexCount;
+
+	// Set index count
+	*ptrIndexCount = m_meshInfos[index].indexCount;
+
+	// Pass
+	return true;
+}
+
 UINT TexRPLib::IM_GPUGeometryModell::getSubmodellCount() {
 	return m_meshCount;
 }
@@ -247,4 +276,48 @@ UINT TexRPLib::IM_GPUGeometryModell::getVerticesCount(UINT index) {
 
 	// Fallback
 	return 0;
+}
+
+TexRPLib::IGPUMask* TexRPLib::IM_GPUGeometryModell::createMask(UINT index, UINT sideLength) {
+	// Bound check
+	if (index < m_meshCount) {
+		// Create mask object
+		IM_GPUMask* ptrMask = TexRPAllocate(IM_GPUMask, IM_GPUMask);
+		if (ptrMask->init(m_ptrDevice.Get(), sideLength)) {
+			// Get geometry data
+			D3D12_VERTEX_BUFFER_VIEW vbView;
+			D3D12_INDEX_BUFFER_VIEW ibView;
+			UINT64 indexCount;
+			createViews(index, &vbView, &ibView, &indexCount);
+			
+			// Bind render pass
+			m_ptrMaskPass->bind(*m_ptrCommandList);
+
+			// Bind mask
+			ptrMask->bindAsRTV(*m_ptrCommandList);
+
+			// Prepare mask render
+			m_ptrCommandList->ptr()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_ptrCommandList->ptr()->IASetVertexBuffers(0, 1, &vbView);
+			m_ptrCommandList->ptr()->IASetIndexBuffer(&ibView);
+
+			// Draw
+			m_ptrCommandList->ptr()->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+
+			// Queue execute sync
+			m_ptrCommandList->close();
+			ID3D12CommandList* execArray[] = { *m_ptrCommandList };
+			m_ptrCommandQueue->dispatchSync(execArray, 1);
+			m_ptrCommandList->reset();
+
+			// Return list
+			return ptrMask;
+		}
+		
+		// Destroy mask (if not returned)
+		TexRPDestroy(ptrMask);
+	}
+	
+	// Fallback
+	return nullptr;
 }

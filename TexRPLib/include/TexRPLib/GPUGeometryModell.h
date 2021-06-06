@@ -3,6 +3,8 @@
 #include <TexRPLib/TEXRP.h>
 #include <TexRPLib/WinInclude.h>
 
+#include <TexRPLib/GPUMask.h>
+
 namespace TexRPLib {
 	// Represents a geometric modell
 	class IGPUGeometryModell {
@@ -21,5 +23,8 @@ namespace TexRPLib {
 
 			// Get vertices count
 			virtual UINT getVerticesCount(UINT index) = 0;
+
+			// Create mask from geometry
+			virtual TexRPLib::IGPUMask* createMask(UINT index, UINT sideLength) = 0;
 	};
 }

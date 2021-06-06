@@ -1,6 +1,9 @@
 #include "IM_GPUContext.h"
 
 TexRPLib::IM_GPUContext::~IM_GPUContext() {
+	// Release pass
+	m_maskPass.release();
+	
 	// Release mebers
 	m_directCommandList.release();
 	m_directCommandQueue.release();
@@ -51,6 +54,11 @@ bool TexRPLib::IM_GPUContext::init(IDXGIAdapter* ptrAdpter) {
 	D3D12_FEATURE_DATA_D3D12_OPTIONS options;
 	ZeroMemory(&options, sizeof(D3D12_FEATURE_DATA_D3D12_OPTIONS));
 	if (FAILED(m_ptrDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(D3D12_FEATURE_DATA_D3D12_OPTIONS))) || options.ConservativeRasterizationTier == D3D12_CONSERVATIVE_RASTERIZATION_TIER_NOT_SUPPORTED) {
+		return false;
+	}
+
+	// Init mask pass
+	if (!m_maskPass.init(m_ptrDevice.Get())) {
 		return false;
 	}
 
@@ -105,7 +113,7 @@ TexRPLib::IGPUTextureStack* TexRPLib::IM_GPUContext::createTextureStack() {
 TexRPLib::IGPUGeometryModell* TexRPLib::IM_GPUContext::openModell(LPCSTR modellPath) {
 	// Allocate texture stack
 	TexRPLib::IM_GPUGeometryModell* ptrGpuModell = TexRPAllocate(IM_GPUGeometryModell, IM_GPUGeometryModell);
-	if (ptrGpuModell->init(m_ptrDevice.Get(), &m_directCommandList, &m_directCommandQueue, modellPath)) {
+	if (ptrGpuModell->init(m_ptrDevice.Get(), &m_directCommandList, &m_directCommandQueue, modellPath, &m_maskPass)) {
 		return ptrGpuModell;
 	}
 

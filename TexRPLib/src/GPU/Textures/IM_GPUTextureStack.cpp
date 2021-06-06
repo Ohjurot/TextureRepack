@@ -24,9 +24,89 @@ void TexRPLib::IM_GPUTextureStack::release() {
 	m_heapSize = 0;
 	m_headHead = 0;
 
+	// Release desc heaps
+	m_descriptorHeapSRV.ReleaseAndGetAddressOf();
+	m_descriptorHeapRTV.ReleaseAndGetAddressOf();
+
 	// Release up/down texture
 	m_downloadTexture.ReleaseAndGetAddressOf();
 	m_uploadTexture.ReleaseAndGetAddressOf();
+}
+
+bool TexRPLib::IM_GPUTextureStack::setRenderTarget(UINT index, ID3D12GraphicsCommandList* ptrCommandList) {
+	// Bound check
+	if (index >= m_textureUsed) {
+		return false;
+	}
+
+	// Check state
+	if (m_arrTexture[index].currentState != D3D12_RESOURCE_STATE_RENDER_TARGET) {
+		// Barrier
+		D3D12_RESOURCE_BARRIER barr;
+		ZeroMemory(&barr, sizeof(D3D12_RESOURCE_BARRIER));
+		barr.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barr.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barr.Transition.pResource = m_arrTexture[index].gpuResource.Get();
+		barr.Transition.Subresource = NULL;
+		barr.Transition.StateBefore = m_arrTexture[index].currentState;
+		barr.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+		// Set current state
+		m_arrTexture[index].currentState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	}
+
+	// Create RTV Description
+	auto rtvHandle = m_descriptorHeapRTV->GetCPUDescriptorHandleForHeapStart();
+	m_device->CreateRenderTargetView(m_arrTexture[index].gpuResource.Get(), NULL, rtvHandle);
+
+	// Check if clear was requested
+	if (m_arrTexture[index].shouldClear) {
+		// Clear to black
+		static float clearColor[] = {0.0f, 0.0f, 0.0f, 0.0f};
+		ptrCommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, NULL);
+
+		// Unset flag
+		m_arrTexture[index].shouldClear = false;
+	}
+
+	// Set RTV
+	ptrCommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, NULL);
+
+	// Set viewport
+	D3D12_VIEWPORT vp = {0, 0, (FLOAT)m_arrTexture[index].info.metaInfo.width, (FLOAT)m_arrTexture[index].info.metaInfo.height, 0.0f, 1.0f};
+	ptrCommandList->RSSetViewports(1, &vp);
+
+	// Set siccor rect
+	D3D12_RECT sr = { 0, 0, (LONG)m_arrTexture[index].info.metaInfo.width, (LONG)m_arrTexture[index].info.metaInfo.height };
+	ptrCommandList->RSSetScissorRects(1, &sr);
+
+	// Pass
+	return true;
+}
+
+bool TexRPLib::IM_GPUTextureStack::setShaderResourceViews(UINT* arrInicies, UINT numIndicies, D3D12_GPU_DESCRIPTOR_HANDLE* ptrOutputHandle) {
+	const auto handleIncrementStepSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = m_descriptorHeapSRV->GetCPUDescriptorHandleForHeapStart();
+
+	// For each index
+	for (unsigned int i = 0; i < numIndicies; i++) {
+		// Check index
+		if (arrInicies[i] >= m_textureUsed) {
+			return false;
+		}
+
+		// Create SRV
+		m_device->CreateShaderResourceView(m_arrTexture[arrInicies[i]].gpuResource.Get(), NULL, srvHandle);
+
+		// Increment handle
+		srvHandle.ptr += handleIncrementStepSize;
+	}
+
+	// Set handle to first heap element
+	*ptrOutputHandle = m_descriptorHeapSRV->GetGPUDescriptorHandleForHeapStart();
+
+	// Pass
+	return true;
 }
 
 bool TexRPLib::IM_GPUTextureStack::reset(UINT width, UINT height, UINT bpp, UINT count) {
@@ -51,6 +131,32 @@ bool TexRPLib::IM_GPUTextureStack::reset(UINT width, UINT height, UINT bpp, UINT
 
 	// Create heap for texture
 	if (FAILED(m_device->CreateHeap(&hd, IID_PPV_ARGS(&m_textureHeap)))) {
+		return false;
+	}
+
+	// Desribe SRV descriptor heap
+	D3D12_DESCRIPTOR_HEAP_DESC sdhd;
+	ZeroMemory(&sdhd, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
+	sdhd.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	sdhd.NumDescriptors = count;
+	sdhd.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	sdhd.NodeMask = NULL;
+
+	// Create SRV descriptor heap
+	if (FAILED(m_device->CreateDescriptorHeap(&sdhd, IID_PPV_ARGS(&m_descriptorHeapSRV)))) {
+		return false;
+	}
+
+	// Describe RTV descriptor heap
+	D3D12_DESCRIPTOR_HEAP_DESC rdhd;
+	ZeroMemory(&rdhd, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
+	rdhd.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	rdhd.NumDescriptors = 1;
+	rdhd.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	rdhd.NodeMask = NULL;
+
+	// Create RTV descriptor heap
+	if (FAILED(m_device->CreateDescriptorHeap(&rdhd, IID_PPV_ARGS(&m_descriptorHeapRTV)))) {
 		return false;
 	}
 
@@ -212,6 +318,10 @@ UINT TexRPLib::IM_GPUTextureStack::loadFromDisk(LPCSTR path) {
 	barr.Transition.Subresource = NULL;
 	m_ptrCmdList->ptr()->ResourceBarrier(1, &barr);
 
+	// Set current state
+	m_arrTexture[resourceIndex].currentState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	m_arrTexture[resourceIndex].shouldClear = false;
+
 	// Execute
 	ID3D12CommandList* arrX[] = { m_ptrCmdList->ptr() };
 	m_ptrCmdList->close();
@@ -266,6 +376,10 @@ UINT TexRPLib::IM_GPUTextureStack::createEmpty(LPCSTR dummyPath, UINT reference)
 	if (FAILED(m_device->CreatePlacedResource(m_textureHeap.Get(), m_headHead, &rd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, NULL, IID_PPV_ARGS(&m_arrTexture[resourceIndex].gpuResource)))) {
 		return UINT_MAX;
 	}
+
+	// Set state
+	m_arrTexture[resourceIndex].currentState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	m_arrTexture[resourceIndex].shouldClear = true;
 
 	// Return index
 	return resourceIndex;
@@ -362,6 +476,19 @@ bool TexRPLib::IM_GPUTextureStack::rename(UINT index, LPCSTR newName) {
 	
 	// Set name
 	m_arrTexture[index].info.metaInfo.fileName = newName;
+
+	// Passed
+	return true;
+}
+
+bool TexRPLib::IM_GPUTextureStack::clearTexture(UINT index) {
+	// Bound checks
+	if (index >= m_textureUsed) {
+		return false;
+	}
+
+	// Set clear flag
+	m_arrTexture[index].shouldClear = true;
 
 	// Passed
 	return true;

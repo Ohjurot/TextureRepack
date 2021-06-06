@@ -66,6 +66,21 @@
     <ClInclude Include="src\GPU\IM_GPUGeometryModell.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\GPU\State\GPUShader.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GPU\Passes\MaskRenderPass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GPU\Passes\IPass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TexRPLib\GPUMask.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GPU\IM_GPUMask.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GPU\GPUInterface.cpp">
@@ -98,10 +113,24 @@
     <ClCompile Include="src\GPU\IM_GPUGeometryModell.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPU\State\GPUShader.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPU\Passes\MaskRenderPass.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPU\IM_GPUMask.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TexRPLib.rc">
       <Filter>Ressourcendateien</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\Shader\MaskPass_VS.hlsl" />
+    <FxCompile Include="src\Shader\MaskPass_PS.hlsl" />
+    <FxCompile Include="src\Shader\MaskPass_RS.hlsl" />
   </ItemGroup>
 </Project>

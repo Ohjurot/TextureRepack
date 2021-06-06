@@ -99,6 +99,7 @@
     <ClInclude Include="include\TexRPLib\GPUContext.h" />
     <ClInclude Include="include\TexRPLib\GPUGeometryModell.h" />
     <ClInclude Include="include\TexRPLib\GPUInterface.h" />
+    <ClInclude Include="include\TexRPLib\GPUMask.h" />
     <ClInclude Include="include\TexRPLib\GPUTextureStack.h" />
     <ClInclude Include="include\TexRPLib\TEXRP.h" />
     <ClInclude Include="include\TexRPLib\WinInclude.h" />
@@ -111,6 +112,10 @@
     <ClInclude Include="src\GPU\IM_GPUContext.h" />
     <ClInclude Include="src\GPU\IM_GPUGeometryModell.h" />
     <ClInclude Include="src\GPU\IM_GPUInterface.h" />
+    <ClInclude Include="src\GPU\IM_GPUMask.h" />
+    <ClInclude Include="src\GPU\Passes\IPass.h" />
+    <ClInclude Include="src\GPU\Passes\MaskRenderPass.h" />
+    <ClInclude Include="src\GPU\State\GPUShader.h" />
     <ClInclude Include="src\GPU\Textures\IM_GPUTextureStack.h" />
     <ClInclude Include="src\Util\MallocdMemory.h" />
   </ItemGroup>
@@ -124,10 +129,39 @@
     <ClCompile Include="src\GPU\IM_GPUContext.cpp" />
     <ClCompile Include="src\GPU\IM_GPUGeometryModell.cpp" />
     <ClCompile Include="src\GPU\IM_GPUInterface.cpp" />
+    <ClCompile Include="src\GPU\IM_GPUMask.cpp" />
+    <ClCompile Include="src\GPU\Passes\MaskRenderPass.cpp" />
+    <ClCompile Include="src\GPU\State\GPUShader.cpp" />
     <ClCompile Include="src\GPU\Textures\IM_GPUTextureStack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TexRPLib.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\Shader\MaskPass_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ps_main</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ps_main</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="src\Shader\MaskPass_RS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RootSignature</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RootSignature</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MASKPASS_RS</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MASKPASS_RS</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">rootsig_1.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">rootsig_1.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Shader\MaskPass_VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs_main</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs_main</EntryPointName>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
