@@ -10,3 +10,5 @@ Currently in development!!
 This libary is using the following Software: 
 
 - Assimp https://github.com/assimp/assimp ([LICENSE](https://github.com/Ohjurot/TextureRepack/blob/main/vendor/assimp/ASSIMP_LICENSE))
+- LUA http://www.lua.org/
+
