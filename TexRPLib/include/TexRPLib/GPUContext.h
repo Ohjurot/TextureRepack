@@ -5,7 +5,7 @@
 #include <TexRPLib/GPUGeometryModell.h>
 
 namespace TexRPLib {
-	class IGPUContext {
+	class IGPUContext : public ITexRPObject {
 		public:
 			// Virtual destructor
 			virtual ~IGPUContext() {};

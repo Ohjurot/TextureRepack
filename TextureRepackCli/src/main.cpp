@@ -1,65 +1,55 @@
 #include <cstdint>
 #include <iostream>
 
-#include <TexRPLib/GPUInterface.h>
+#include <lua/lua.hpp>
+#include <Util/Console.h>
+
+#include <LuaWrapper/LState.h>
+
+/*
+* Cli Usage
+* texrp <sysargs...> [SCRIPTNAME] <scriptargs...>
+*	sysargs:   [-[NAME]]<:<VALUE>>
+*   scripargs: [-[NAME]]<:<VALUE>>		--> NAME		  = VALUE
+*   scripargs: [VALUE]					--> 0 ... 1 ... n = VALUE
+* 
+*	List of system args:
+*	-nocolor : Disables colors in the console
+*   -silent	 : Disables console output
+*/
+
+/*
+* TODO:
+* - Command line arguments
+* - Add return codes
+* - Proper error handling
+*/
+
+#include <LuaWrapper/Handles/LuaHandle.h>
+#include <LuaWrapper/LBindings.h>
+#include <LuaWrapper/LHelperBindings.h>
+
+using namespace TexRPCli;
 
 // Application entry point
 int main(int argc, char** argv) {
-	// Get and echo interface
-	TexRPLib::IGPUInterface* gpuInterface = TexRPLib::enumGpuInterfaces(0);
-	std::wcout << L"GPU Name: " << gpuInterface->getGPUName() << std::endl << L"Current OS Memory Budge: " << gpuInterface->getGPUFreeVRAM() / 1024 / 1024 << L" MB" << std::endl;
+	// Lua State
+	Lua::State state;
+	Lua::LuaHandle::bind(state);
+	Lua::Bindings::bind(state);
+	Lua::HelperBindings::bind(state);
 
-	// Create gpu context
-	TexRPLib::IGPUContext* gpuContext = gpuInterface->createContex();
+	// Load file and run
+	luaL_loadfile(state, "test.lua");
+	auto res = lua_pcall(state, 0, LUA_MULTRET, 0);
 
-	// Reserve memory
-	auto reserveOk = gpuInterface->setVRAMReservation(1024ULL * 1024ULL * 1024ULL * 4ULL);
-	auto reserverFeedback = gpuInterface->getVRAMReservation();
-
-	// Check support for common formats
-	DXGI_FORMAT fmts[] = {
-		DXGI_FORMAT_R8G8B8A8_UNORM,
-		DXGI_FORMAT_R16G16B16A16_UNORM,
-		DXGI_FORMAT_R8_UNORM,
-	};
-	for (unsigned int i = 0; i < _countof(fmts); i++) {
-		std::wcout << L"[" << i + 1 << L"] Input: " << gpuContext->checkInputSupport(fmts[i]) << L" Output: " << gpuContext->checkOutputSupport(fmts[i]) << std::endl;
+	// Error Handling
+	if (res && lua_isstring(state, -1)) {
+		Console::get().writeLine(lua_tostring(state, -1));
 	}
 
-	// Allocate texture stack
-	TexRPLib::IGPUTextureStack* ptrStack = gpuContext->createTextureStack();
-	ptrStack->reset(2048, 2048, 32, 32);
-
-	// Test loading and saving a texture
-	auto t01 = ptrStack->loadFromDisk("./3guys_Box_BaseColor.png");
-	auto t02 = ptrStack->loadFromDisk("./3guys_Sphere_BaseColor.png");
-	auto t03 = ptrStack->loadFromDisk("./3guys_Torus_BaseColor.png");
-	auto tres = ptrStack->createEmpty("./3guys_BaseColor.png", t01);
-
-	// Test loading a modell
-	TexRPLib::IGPUGeometryModell* ptrModell = gpuContext->openModell("./3guys.fbx");
-
-	// Create a mask
-	TexRPLib::IGPUMask* ptrMask01 = ptrModell->createMask(0, 2048);
-	TexRPLib::IGPUMask* ptrMask02 = ptrModell->createMask(1, 2048);
-	TexRPLib::IGPUMask* ptrMask03 = ptrModell->createMask(2, 2048);
-
-	// Merge
-	UINT input[] = {t01, t02, t03};
-	TexRPLib::IGPUMask* masks[] = { ptrMask01, ptrMask02, ptrMask03 };
-	gpuContext->mergTextures(masks, ptrStack, tres, 3, input);
-
-	// Download final texture
-	ptrStack->safeToDisk(tres);
-
-	// Cleanup
-	TexRPDestroy(ptrMask01);
-	TexRPDestroy(ptrMask02);
-	TexRPDestroy(ptrMask03);
-	TexRPDestroy(ptrModell);
-	TexRPDestroy(ptrStack);
-	TexRPDestroy(gpuContext);
-	TexRPDestroy(gpuInterface);
+	// Shutdown handles
+	Lua::HandleManager::get().release();
 
 	// Passed OK
 	return 0;

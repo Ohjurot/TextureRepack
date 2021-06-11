@@ -4,7 +4,7 @@
 #include <TexRPLib/WinInclude.h>
 
 namespace TexRPLib {
-	class IGPUMask {
+	class IGPUMask : public ITexRPObject {
 		public:
 			// Virtual destructor
 			virtual ~IGPUMask() {}

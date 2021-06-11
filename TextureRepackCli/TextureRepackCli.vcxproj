@@ -80,15 +80,17 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\obj\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)\TexRPLib\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)src\;$(SolutionDir)\vendor\lua\include\;$(SolutionDir)\TexRPLib\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)vendor\lua\;$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <TargetName>texrp</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\obj\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)\TexRPLib\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)src\;$(SolutionDir)\vendor\lua\include\;$(SolutionDir)\TexRPLib\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)vendor\lua\;$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <TargetName>texrp</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -129,7 +131,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>TexRPLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TexRPLib.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -147,16 +149,32 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>TexRPLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TexRPLib.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\LuaWrapper\Handles\HandleManager.cpp" />
+    <ClCompile Include="src\LuaWrapper\Handles\LuaHandle.cpp" />
+    <ClCompile Include="src\LuaWrapper\LBindings.cpp" />
+    <ClCompile Include="src\LuaWrapper\LHelperBindings.cpp" />
+    <ClCompile Include="src\LuaWrapper\LState.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Util\Console.cpp" />
+    <ClCompile Include="src\Util\DefaultDirs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TexRPLib\TexRPLib.vcxproj">
       <Project>{bc7b19d1-85c9-46c0-b866-6cedeb518e09}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\LuaWrapper\Handles\HandleManager.h" />
+    <ClInclude Include="src\LuaWrapper\Handles\LuaHandle.h" />
+    <ClInclude Include="src\LuaWrapper\LBindings.h" />
+    <ClInclude Include="src\LuaWrapper\LHelperBindings.h" />
+    <ClInclude Include="src\LuaWrapper\LState.h" />
+    <ClInclude Include="src\Util\Console.h" />
+    <ClInclude Include="src\Util\DefaultDirs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

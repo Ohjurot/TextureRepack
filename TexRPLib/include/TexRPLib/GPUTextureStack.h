@@ -4,7 +4,7 @@
 #include <TexRPLib/WinInclude.h>
 
 namespace TexRPLib {
-	class IGPUTextureStack {
+	class IGPUTextureStack : public ITexRPObject {
 		public:
 			// Virtual destructor
 			virtual ~IGPUTextureStack() {};

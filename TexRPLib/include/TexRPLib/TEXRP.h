@@ -8,3 +8,8 @@
 
 #define TexRPAllocate(ttype, type, ...) (ttype*)new type(__VA_ARGS__)
 #define TexRPDestroy(ptrObject) delete ptrObject
+
+class ITexRPObject {
+	public:
+		virtual ~ITexRPObject() {};
+};

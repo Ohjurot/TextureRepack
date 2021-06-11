@@ -5,7 +5,7 @@
 #include <TexRPLib/GPUContext.h>
 
 namespace TexRPLib {
-	class IGPUInterface {
+	class IGPUInterface : public ITexRPObject {
 		public:
 			// Virtual destructor
 			virtual ~IGPUInterface() {};

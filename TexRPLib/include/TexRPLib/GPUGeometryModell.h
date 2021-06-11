@@ -7,7 +7,7 @@
 
 namespace TexRPLib {
 	// Represents a geometric modell
-	class IGPUGeometryModell {
+	class IGPUGeometryModell : public ITexRPObject {
 		public:
 			// Virtual destructor
 			virtual ~IGPUGeometryModell() {};
