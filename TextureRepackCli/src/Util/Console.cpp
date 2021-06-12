@@ -11,6 +11,10 @@ void TexRPCli::Console::setColorEnable(bool enable) {
 	m_enableColor = enable;
 }
 
+void TexRPCli::Console::setOutputEnable(bool output) {
+	m_outputEnable = output;
+}
+
 void TexRPCli::Console::setColor(ConsoleColor color) {
 	// Exit when colors are not enabled
 	if (!m_enableColor) {
@@ -36,7 +40,9 @@ void TexRPCli::Console::setTitle(LPCSTR title) {
 }
 
 void TexRPCli::Console::write(LPCSTR text) {
-	WriteConsoleA(m_hOutputHandle, text, strlen(text), NULL, NULL);
+	if (m_outputEnable) {
+		WriteConsoleA(m_hOutputHandle, text, strlen(text), NULL, NULL);
+	}
 }
 
 void TexRPCli::Console::writeLine(LPCSTR text) {
@@ -45,6 +51,12 @@ void TexRPCli::Console::writeLine(LPCSTR text) {
 }
 
 DWORD TexRPCli::Console::readLine(CHAR* buffer, DWORD maxLength) {
+	// Check output enable
+	if (!m_outputEnable) {
+		buffer[0] = '\0';
+		return 0;
+	}
+	
 	// Build read info
 	CONSOLE_READCONSOLE_CONTROL readControle;
 	readControle.nLength = sizeof(CONSOLE_READCONSOLE_CONTROL);

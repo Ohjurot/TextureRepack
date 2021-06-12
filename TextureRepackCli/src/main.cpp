@@ -9,7 +9,7 @@
 /*
 * Cli Usage
 * texrp <sysargs...> [SCRIPTNAME] <scriptargs...>
-*	sysargs:   [-[NAME]]<:<VALUE>>
+*	sysargs:   [-[NAME]]
 *   scripargs: [-[NAME]]<:<VALUE>>		--> NAME		  = VALUE
 *   scripargs: [VALUE]					--> 0 ... 1 ... n = VALUE
 * 
@@ -22,17 +22,42 @@
 * TODO:
 * - Command line arguments
 * - Add return codes
-* - Proper error handling
+* (- Advanced error handling)
 */
 
 #include <LuaWrapper/Handles/LuaHandle.h>
 #include <LuaWrapper/LBindings.h>
 #include <LuaWrapper/LHelperBindings.h>
 
+#include <Util/CommandLineArgs.h>
+#include <Util/Console.h>
+#include <Util/FileFinder.h>
+
 using namespace TexRPCli;
 
 // Application entry point
 int main(int argc, char** argv) {
+	// Parse the command line
+	CommandLineArgs args(argc, argv);
+	if (!args.getScriptName()) {
+		Console::get().writeLine("Usage: texrp <system_args> [script_name] <script_args>");
+		return -1;
+	}
+	
+	// System setup
+	Console::get().setOutputEnable(!args.checkSystemArg("silent"));
+	Console::get().setColorEnable(!args.checkSystemArg("nocolor"));
+
+	// Find file
+	FileFinder f("paths.txt");
+	CHAR scriptPath[4096];
+	if (!f.findFile(args.getScriptName(), scriptPath, 4096)) {
+		Console::get().write("Script \"");
+		Console::get().write(args.getScriptName());
+		Console::get().writeLine("\" not found!");
+		return -1;
+	}
+
 	// Lua State
 	Lua::State state;
 	Lua::LuaHandle::bind(state);
@@ -40,7 +65,7 @@ int main(int argc, char** argv) {
 	Lua::HelperBindings::bind(state);
 
 	// Load file and run
-	luaL_loadfile(state, "test.lua");
+	luaL_loadfile(state, scriptPath);
 	auto res = lua_pcall(state, 0, LUA_MULTRET, 0);
 
 	// Error Handling

@@ -159,8 +159,10 @@
     <ClCompile Include="src\LuaWrapper\LHelperBindings.cpp" />
     <ClCompile Include="src\LuaWrapper\LState.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Util\CommandLineArgs.cpp" />
     <ClCompile Include="src\Util\Console.cpp" />
     <ClCompile Include="src\Util\DefaultDirs.cpp" />
+    <ClCompile Include="src\Util\FileFinder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TexRPLib\TexRPLib.vcxproj">
@@ -173,8 +175,10 @@
     <ClInclude Include="src\LuaWrapper\LBindings.h" />
     <ClInclude Include="src\LuaWrapper\LHelperBindings.h" />
     <ClInclude Include="src\LuaWrapper\LState.h" />
+    <ClInclude Include="src\Util\CommandLineArgs.h" />
     <ClInclude Include="src\Util\Console.h" />
     <ClInclude Include="src\Util\DefaultDirs.h" />
+    <ClInclude Include="src\Util\FileFinder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

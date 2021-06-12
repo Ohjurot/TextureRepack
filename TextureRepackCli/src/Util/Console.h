@@ -28,6 +28,8 @@ namespace TexRPCli {
 
 			// Set color enabled
 			void setColorEnable(bool enable);
+			// Controle console output
+			void setOutputEnable(bool output);
 			// Set the color of the console
 			void setColor(ConsoleColor color);
 			// Sets the console title
@@ -55,5 +57,6 @@ namespace TexRPCli {
 
 			// Indicates 
 			bool m_enableColor = true;
+			bool m_outputEnable = true;
 	};
 }
