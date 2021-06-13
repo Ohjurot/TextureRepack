@@ -3,7 +3,7 @@
 Welcome to the Texture Repack Documentation! Here you will find all information required to use and or develop with Texture Repack.
 
 ### Select your area of interests
-<table width="100%">
+<table style="width: 100%;">
     <colgroup>
        <col span="1" style="width: 50%;">
        <col span="1" style="width: 50%;">
