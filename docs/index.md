@@ -2,7 +2,7 @@
 
 Welcome to the Texture Repack Documentation! Here you will find all information required to use and or develop with Texture Repack.
 
-### Select your area of interests
+### Select your area of interest
 
 
 <div style="width: 100%;">
