@@ -18,6 +18,7 @@ void TexRPCli::Lua::Bindings::bind(lua_State* ptrState) {
 	// === IGPUGeometryModell ===
 	lua_register(ptrState, "IGPUGeometryModell_GetSubmodellCount", &TexRPCli::Lua::Bindings::lua_IGPUGeometryModell_GetSubmodellCount);
 	lua_register(ptrState, "IGPUGeometryModell_GetSubmodellName", &TexRPCli::Lua::Bindings::lua_IGPUGeometryModell_GetSubmodellName);
+	lua_register(ptrState, "IGPUGeometryModell_GetSubmodellMaterialName", &TexRPCli::Lua::Bindings::lua_IGPUGeometryModell_GetSubmodellMaterialName);
 	lua_register(ptrState, "IGPUGeometryModell_GetUVSetIndex", &TexRPCli::Lua::Bindings::lua_IGPUGeometryModell_GetUVSetIndex);
 	lua_register(ptrState, "IGPUGeometryModell_GetVerticesCount", &TexRPCli::Lua::Bindings::lua_IGPUGeometryModell_GetVerticesCount);
 	lua_register(ptrState, "IGPUGeometryModell_CreateMask", &TexRPCli::Lua::Bindings::lua_IGPUGeometryModell_CreateMask);
@@ -387,6 +388,28 @@ int TexRPCli::Lua::Bindings::lua_IGPUGeometryModell_GetSubmodellName(lua_State* 
 			if (ptrModell && llIndex >= 0) {
 				// Push and return
 				lua_pushstring(ptrState, ptrModell->getSubmodellName(llIndex));
+				return 1;
+			}
+		}
+	}
+
+	// NIL
+	lua_pushnil(ptrState);
+	return 1;
+}
+
+int TexRPCli::Lua::Bindings::lua_IGPUGeometryModell_GetSubmodellMaterialName(lua_State* ptrState) {
+	// Check
+	if (lua_isinteger(ptrState, 1) && lua_isinteger(ptrState, 2)) {
+		// Get handle
+		Handle* ptrHandle = (Handle*)lua_tointeger(ptrState, 1);
+		long long llIndex = lua_tointeger(ptrState, 2);
+		if (ptrHandle) {
+			// Convert handle
+			TexRPLib::IGPUGeometryModell* ptrModell = ptrHandle->get<TexRPLib::IGPUGeometryModell>();
+			if (ptrModell && llIndex >= 0) {
+				// Push and return
+				lua_pushstring(ptrState, ptrModell->getSubmodellMatterialName(llIndex));
 				return 1;
 			}
 		}

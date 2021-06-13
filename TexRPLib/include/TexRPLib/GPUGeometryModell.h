@@ -18,6 +18,9 @@ namespace TexRPLib {
 			// Get name of submodell
 			virtual LPCSTR getSubmodellName(UINT index) = 0;
 
+			// Get name of submodell material
+			virtual LPCSTR getSubmodellMatterialName(UINT index) = 0;
+
 			// Get the uv set indesx assoicated with that geometry slot
 			virtual UINT getUVSetIndex(UINT index) = 0;
 

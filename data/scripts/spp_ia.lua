@@ -79,7 +79,7 @@ if CheckHandle(interface) then
                                 indexArr = {}
                                 for i=0,subCount-1 do
                                     -- Build texture path
-                                    imgPath = GetWorkDir() .. "\\" .. mdlName .. "_" .. IGPUGeometryModell_GetSubmodellName(modell, i) .. "_" .. name .. "." .. imgExt
+                                    imgPath = GetWorkDir() .. "\\" .. mdlName .. "_" .. IGPUGeometryModell_GetSubmodellMaterialName(modell, i) .. "_" .. name .. "." .. imgExt
                                     -- Check and load
                                     table.insert(indexArr, IGPUTextureStack_LoadFromDisk(textures, imgPath))
                                 end

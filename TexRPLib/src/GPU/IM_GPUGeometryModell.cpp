@@ -142,7 +142,8 @@ bool TexRPLib::IM_GPUGeometryModell::init(ID3D12Device* ptrDevice, TexRP::GPUCom
 		ZeroMemory(&meshTemplate, sizeof(MeshInfo));
 
 		// Input indicies information
-		strcpy_s<256>(meshTemplate.name, ptrMesh->mName.C_Str());
+		strcpy_s<256>(meshTemplate.materialName, ptrScene->mMaterials[ptrMesh->mMaterialIndex]->GetName().C_Str());
+		strcpy_s<256>(meshTemplate.meshName, ptrMesh->mName.C_Str());
 		meshTemplate.indexOffset = indexOffset;
 		meshTemplate.indexCount = 0;
 
@@ -251,9 +252,19 @@ UINT TexRPLib::IM_GPUGeometryModell::getSubmodellCount() {
 LPCSTR TexRPLib::IM_GPUGeometryModell::getSubmodellName(UINT index) {
 	// Return name if in range
 	if (index < m_meshCount) {
-		return m_meshInfos[index].name;
+		return m_meshInfos[index].meshName;
 	}
 	
+	// Fallback
+	return nullptr;
+}
+
+LPCSTR TexRPLib::IM_GPUGeometryModell::getSubmodellMatterialName(UINT index) {
+	// Return name if in range
+	if (index < m_meshCount) {
+		return m_meshInfos[index].materialName;
+	}
+
 	// Fallback
 	return nullptr;
 }

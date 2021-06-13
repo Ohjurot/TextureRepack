@@ -32,6 +32,7 @@ namespace TexRPLib {
 			// Implement interface
 			UINT getSubmodellCount() override;
 			LPCSTR getSubmodellName(UINT index) override;
+			LPCSTR getSubmodellMatterialName(UINT index) override;
 			UINT getUVSetIndex(UINT index) override;
 			UINT getVerticesCount(UINT index) override;
 			TexRPLib::IGPUMask* createMask(UINT index, UINT sideLength) override;
@@ -40,7 +41,8 @@ namespace TexRPLib {
 			// Basic mesh info
 			struct MeshInfo {
 				// Name of mesh
-				CHAR name[256];
+				CHAR meshName[256];
+				CHAR materialName[256];
 
 				// UV Set representd by this struct
 				UINT uvSet;

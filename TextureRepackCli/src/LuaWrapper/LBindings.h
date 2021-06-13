@@ -49,6 +49,8 @@ namespace TexRPCli {
 				static int lua_IGPUGeometryModell_GetSubmodellCount(lua_State* ptrState);
 				// nil / string = IGPUGeometryModell_GetSubmodellName(handle, index)
 				static int lua_IGPUGeometryModell_GetSubmodellName(lua_State* ptrState);
+				// nil / string = IGPUGeometryModell_GetSubmodellMaterialName(handle, index)
+				static int lua_IGPUGeometryModell_GetSubmodellMaterialName(lua_State* ptrState);
 				// nil / int = IGPUGeometryModell_GetUVSetIndex(handle, index)
 				static int lua_IGPUGeometryModell_GetUVSetIndex(lua_State* ptrState);
 				// nil / int = IGPUGeometryModell_GetVerticesCount(handle, index)
