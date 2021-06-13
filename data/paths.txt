@@ -1,0 +1,7 @@
+${NAME}
+${APP_DIR}\scripts\${NAME}
+${APP_DIR}\scripts\${NAME}.lua
+${USR_DIR}\scripts\${NAME}
+${USR_DIR}\scripts\${NAME}.lua
+${RUN_DIR}\${NAME}
+${RUN_DIR}\${NAME}.lua
