@@ -9,7 +9,7 @@ namespace TexRPCli {
 		class HelperBindings {
 			public:
 				// Bind function
-				static void bind(lua_State* ptrState);
+				static void bind(lua_State* ptrState, const char* libVersion, const char* cliVersion);
 
 				// Retrives the scripts return code
 				static int getScriptReturnCode();

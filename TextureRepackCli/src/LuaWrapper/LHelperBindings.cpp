@@ -3,7 +3,13 @@
 // Lua return code
 int TexRPCli::Lua::HelperBindings::luaReturnCode = 0;
 
-void TexRPCli::Lua::HelperBindings::bind(lua_State* ptrState) {
+void TexRPCli::Lua::HelperBindings::bind(lua_State* ptrState, const char* libVersion, const char* cliVersion) {
+	// === Version ===
+	lua_pushstring(ptrState, libVersion);
+	lua_setglobal(ptrState, "TEXRP_LIB_VERSION");
+	lua_pushstring(ptrState, cliVersion);
+	lua_setglobal(ptrState, "TEXRP_CLI_VERSION");
+	
 	// === Console ===
 	// Functions
 	lua_register(ptrState, "ConsoleColor", &TexRPCli::Lua::HelperBindings::lua_ConsoleColor);

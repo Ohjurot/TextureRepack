@@ -6,6 +6,8 @@
 
 #include <LuaWrapper/LState.h>
 
+#define TEXRP_CLI_VERSION "TexRPCli V 0.2"
+
 /*
 * Cli Usage
 * texrp <sysargs...> [SCRIPTNAME] <scriptargs...>
@@ -62,7 +64,7 @@ int main(int argc, char** argv) {
 	Lua::State state;
 	Lua::LuaHandle::bind(state);
 	Lua::Bindings::bind(state);
-	Lua::HelperBindings::bind(state);
+	Lua::HelperBindings::bind(state, TEXRP_LIB_VERSION, TEXRP_CLI_VERSION);
 
 	// Load file and run
 	luaL_loadfile(state, scriptPath);
