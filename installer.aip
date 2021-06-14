@@ -3,7 +3,7 @@ AIVersion=8.2
 AIEdition=0
 GUID={CF2650D8-D134-4755-ADEB-3017AEDC45D0}
 AppName=TextureRepack
-AppVersion=0.1
+AppVersion=0.2
 AppDescription=Texture Repack is a small util application that allows the repackaging of textures on windows
 CompanyName=Ludwig Füchsl
 WebSite=https://github.com/Ohjurot/TextureRepack
@@ -145,7 +145,7 @@ OptionNoTreeView=0
 OptionRelativePath=0
 OptionSignFile=0
 OptionSignFileAll=0
-OptionSignCommand=/K signtool sign /f MyCert.pfx "<SetupExe>"  
+OptionSignCommand=/K signtool sign /f MyCert.pfx "<SetupExe>"
 
 [Files]
 0=D:\Dev\cpp\github-projects\TextureRepack\bin\x64-Release\assimp-vc142-mt.dll?<InstallDir>\assimp-vc142-mt.dll?1?1
@@ -159,7 +159,7 @@ OptionSignCommand=/K signtool sign /f MyCert.pfx "<SetupExe>"
 8=D:\Dev\cpp\github-projects\TextureRepack\bin\x64-Release\texrp.exe?<InstallDir>\texrp.exe?1?1
 9=D:\Dev\cpp\github-projects\TextureRepack\bin\x64-Release\TexRPLib.dll?<InstallDir>\TexRPLib.dll?1?1
 10=?<InstallDir>\scripts\?1?1
-11=D:\Dev\cpp\github-projects\TextureRepack\data\scripts\spp_ia.lua?<InstallDir>\scripts\spp_ia.lua?1?1
+11=D:\Dev\cpp\github-projects\TextureRepack\data\scripts\spp_ia.lua?<InstallDir>\scripts\spp_ia.lua?2?1
 12=<AIDir>\Uninstall.exe?<InstallDir>\Uninstall.exe?1?1
 
 [Shortcuts]

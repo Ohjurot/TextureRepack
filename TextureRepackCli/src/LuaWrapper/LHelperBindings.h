@@ -3,13 +3,14 @@
 #include <lua/lua.hpp>
 #include <Util/Console.h>
 #include <Util/DefaultDirs.h>
+#include <Util/CommandLineArgs.h>
 
 namespace TexRPCli {
 	namespace Lua {
 		class HelperBindings {
 			public:
 				// Bind function
-				static void bind(lua_State* ptrState, const char* libVersion, const char* cliVersion);
+				static void bind(lua_State* ptrState, CommandLineArgs* ptrCmdLineArgs, const char* libVersion, const char* cliVersion);
 
 				// Retrives the scripts return code
 				static int getScriptReturnCode();
@@ -44,13 +45,18 @@ namespace TexRPCli {
 				static int lua_GetAppDir(lua_State* ptrState);
 				// string GetUserDir()
 				static int lua_GetUserDir(lua_State* ptrState);
+				// nil / string GetCmdArg(int / string)
+				static int lua_GetCmdArg(lua_State* ptrState);
 
 				// === Return code ===
 				// void ReturnCode(int)
 				static int lua_ReturnCode(lua_State* ptrState);
 
+				// === STATIC MEMBERS ===
 				// Return code from lua application
 				static int luaReturnCode;
+				// Command line args pointer
+				static CommandLineArgs* ptrCmdArgs;
 		};
 	}
 }

@@ -1,9 +1,13 @@
 #include "LHelperBindings.h"
 
-// Lua return code
+// Static instance
 int TexRPCli::Lua::HelperBindings::luaReturnCode = 0;
+TexRPCli::CommandLineArgs* TexRPCli::Lua::HelperBindings::ptrCmdArgs = nullptr;
 
-void TexRPCli::Lua::HelperBindings::bind(lua_State* ptrState, const char* libVersion, const char* cliVersion) {
+void TexRPCli::Lua::HelperBindings::bind(lua_State* ptrState, CommandLineArgs* ptrCmdLineArgs, const char* libVersion, const char* cliVersion) {
+	// Set global
+	ptrCmdArgs = ptrCmdLineArgs;
+	
 	// === Version ===
 	lua_pushstring(ptrState, libVersion);
 	lua_setglobal(ptrState, "TEXRP_LIB_VERSION");
@@ -48,6 +52,7 @@ void TexRPCli::Lua::HelperBindings::bind(lua_State* ptrState, const char* libVer
 	lua_register(ptrState, "GetAppDir", &TexRPCli::Lua::HelperBindings::lua_GetAppDir);
 	lua_register(ptrState, "GetWorkDir", &TexRPCli::Lua::HelperBindings::lua_GetWorkDir);
 	lua_register(ptrState, "GetUserDir", &TexRPCli::Lua::HelperBindings::lua_GetUserDir);
+	lua_register(ptrState, "GetCmdArg", &TexRPCli::Lua::HelperBindings::lua_GetCmdArg);
 
 	// === Return code ===
 	lua_register(ptrState, "ReturnCode", &TexRPCli::Lua::HelperBindings::lua_ReturnCode);
@@ -187,6 +192,38 @@ int TexRPCli::Lua::HelperBindings::lua_GetAppDir(lua_State* ptrState) {
 int TexRPCli::Lua::HelperBindings::lua_GetUserDir(lua_State* ptrState) {
 	// Lua push path
 	lua_pushstring(ptrState, TexRPCli::DefaultDirs::getUserDir());
+	return 1;
+}
+
+int TexRPCli::Lua::HelperBindings::lua_GetCmdArg(lua_State* ptrState) {
+	// Check by index
+	if (lua_isinteger(ptrState, 1)) {
+		// Get and check index
+		long long index = lua_tointeger(ptrState, 1);
+		if (index >= 0) {
+			// Get and check arg
+			const char* arg = ptrCmdArgs->getOrderedScriptArg(index);
+			if (arg) {
+				// Push and return
+				lua_pushstring(ptrState, arg);
+				return 1;
+			} 
+		}
+	}
+	// Check by name
+	else if (lua_isstring(ptrState, 1)) {
+		// Get and check nmae
+		const char* name = lua_tostring(ptrState, 1);
+		const char* arg = ptrCmdArgs->getNamedScriptArg(name);
+		if (arg) {
+			// Push and return
+			lua_pushstring(ptrState, arg);
+			return 1;
+		}
+	}
+
+	// Nil error
+	lua_pushnil(ptrState);
 	return 1;
 }
 

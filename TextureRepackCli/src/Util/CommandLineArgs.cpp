@@ -18,7 +18,58 @@ TexRPCli::CommandLineArgs::CommandLineArgs(int argc, char** argv) {
 		index++;
 	}
 
-	// TODO: Script arguments
+	// Script arguments
+	while (argc > index) {
+		// Builder stream and strings
+		std::stringstream ss;
+		std::string argName;
+		
+		// State machine
+		int state = 0;
+		const char* readHead = argv[index];
+		const char* readEnd = &readHead[strlen(readHead)];
+		while (readHead < readEnd) {
+			// State machine switch
+			switch (state) {
+				// Reading name / value
+				case 0: {
+					// Seperator --> name arg
+					if (*readHead == '=') {
+						// Store clear next
+						argName = ss.str();
+						ss.str("");
+						state = 1;
+					}
+					// Normal char
+					else {
+						ss << *readHead;
+					}
+					break;
+				}
+				// Reading value
+				case 1: {
+					ss << *readHead;
+					break;
+				}
+			}
+
+			// Inrement
+			readHead++;
+		}
+
+		// Check state
+		if (state == 0) {
+			// Push back normal ordered arg
+			m_luaOrdereArgs.push_back(argv[index]);
+		}
+		else {
+			// Insert named arg
+			m_luaNamedArgs.emplace(std::pair<std::string, std::string>(argName, ss.str()));
+		}
+
+		// Increment
+		index++;
+	}
 }
 
 bool TexRPCli::CommandLineArgs::checkSystemArg(const char* name) {
@@ -35,4 +86,19 @@ bool TexRPCli::CommandLineArgs::checkSystemArg(const char* name) {
 
 const char* TexRPCli::CommandLineArgs::getScriptName() {
 	return m_scriptName;
+}
+
+const char* TexRPCli::CommandLineArgs::getOrderedScriptArg(unsigned int index) {
+	// Bound check
+	if (index >= m_luaOrdereArgs.size()) {
+		return nullptr;
+	}
+
+	// Return at position
+	return m_luaOrdereArgs[index];
+}
+
+const char* TexRPCli::CommandLineArgs::getNamedScriptArg(const char* name) {
+	auto itFind = m_luaNamedArgs.find(name);
+	return itFind != m_luaNamedArgs.end() ? itFind->second.c_str() : nullptr;
 }

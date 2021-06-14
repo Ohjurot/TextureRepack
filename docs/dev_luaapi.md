@@ -211,7 +211,7 @@ booleanReturnType = IGPUTextureStack_Rename(textureStackHandle, textureIndex, ".
 
 Will not reload the texture. Will rename the texture for saving --> not overriding
 
-
+### 
 
 ------
 
@@ -269,10 +269,21 @@ booleanReturnType = FileDelete(".\\myFile.txt") -- Deletes a file
 booleanReturnType = FileMove(".\\myFile.txt", ".\\output\\myFile.txt") -- Moves / Renames a file
 ```
 
+
+
+#### Environment
+
 ##### Application return code
 
 ```lua
 ReturnCode(0) -- Sets the applications return code
+```
+
+##### Command line arguments
+
+```lua
+stringReturnType = GetCmdArg(index) -- Used to retrive args that are passed without a name "texrp myscript value" --> "value"
+stringReturnType = GetCmdArg("name") -- Used to retrive args that are passed with a name "texrp myscript name=value" --> "value"
 ```
 
 

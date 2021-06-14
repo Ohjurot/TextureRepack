@@ -6,11 +6,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>spp_ia</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>spp_ia orderA nameA=valA nameB=valB orderB</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>$(SolutionDir)bin\$(PlatformShortName)-$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>spp_ia</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>spp_ia orderA nameA=valA nameB=valB orderB</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
