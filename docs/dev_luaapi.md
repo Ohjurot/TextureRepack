@@ -162,6 +162,57 @@ Returns a handle of type `GPUMask`. Representing the coverage of the submodel in
 
 
 
+#### IGPUTextureStack (Functions for `GPUTextureStack` handles)
+
+##### Reseting the texture stack (required at least once!)
+
+```lua
+-- textureStackHandle: must be a valid handle of type GPUTextureStack
+-- width: Maximum texture width
+-- height: Maximum texture height
+-- bitsPerPixel: can be 32 / 64 (8-Bit / 16-Bit)
+-- count: maximum number of textures
+booleanReturnType = IGPUTextureStack_Reset(textureStackHandle, width, height, bitsPerPixel, count)
+```
+
+##### Loading textures from disk
+
+```lua
+textureIndexInteger = IGPUTextureStack_LoadFromDisk(textureStackHandle, ".\\pathto\\image.png") -- First parameter must be a valid handle of type GPUTextureStack 
+```
+
+Returned index used to modify the texture and reference it while merging
+
+##### Creating an empty texture from a template
+
+```lua
+textureIndexInteger = IGPUTextureStack_CreateEmpty(textureStackHandle, templateIndex, ".\\pathto\\dummy_image.png") -- First parameter must be a valid handle of type GPUTextureStack 
+```
+
+Path is used to safe the texture. Template index is returned from Load From Disk. Parameters will be copied name is changed. Returned index used to modify the texture and reference it while merging
+
+##### Clear a texture to zero
+
+```lua
+booleanReturnType = IGPUTextureStack_ClearTexture(textureStackHandle, textureIndex) -- First parameter must be a valid handle of type GPUTextureStack 
+```
+
+##### Safe a texture to disk
+
+```lua
+booleanReturnType = IGPUTextureStack_SafeToDisk(textureStackHandle, textureIndex) -- First parameter must be a valid handle of type GPUTextureStack 
+```
+
+##### Rename a texture
+
+```lua
+booleanReturnType = IGPUTextureStack_Rename(textureStackHandle, textureIndex, ".\\newpathto\\image.png") -- First parameter must be a valid handle of type GPUTextureStack 
+```
+
+Will not reload the texture. Will rename the texture for saving --> not overriding
+
+
+
 ------
 
 ### Helper Functions
@@ -217,3 +268,9 @@ booleanReturnType = FileCopy(".\\myFile.txt", ".\\myFile_copy.txt") -- Copys a f
 booleanReturnType = FileDelete(".\\myFile.txt") -- Deletes a file
 booleanReturnType = FileMove(".\\myFile.txt", ".\\output\\myFile.txt") -- Moves / Renames a file
 ```
+
+
+
+
+
+**Remarks**: There are a few more undocumented function that are not critical for generic usage. Fell free to play around!
