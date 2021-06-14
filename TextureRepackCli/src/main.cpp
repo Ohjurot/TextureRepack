@@ -22,7 +22,6 @@
 
 /*
 * TODO:
-* - Command line arguments
 * (- Advanced error handling)
 */
 
