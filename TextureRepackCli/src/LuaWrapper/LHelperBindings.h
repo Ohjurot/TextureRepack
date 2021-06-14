@@ -11,6 +11,9 @@ namespace TexRPCli {
 				// Bind function
 				static void bind(lua_State* ptrState);
 
+				// Retrives the scripts return code
+				static int getScriptReturnCode();
+
 			private:
 				// === Console ===
 				// void ConsoleWriteLine(string)
@@ -41,6 +44,13 @@ namespace TexRPCli {
 				static int lua_GetAppDir(lua_State* ptrState);
 				// string GetUserDir()
 				static int lua_GetUserDir(lua_State* ptrState);
+
+				// === Return code ===
+				// void ReturnCode(int)
+				static int lua_ReturnCode(lua_State* ptrState);
+
+				// Return code from lua application
+				static int luaReturnCode;
 		};
 	}
 }

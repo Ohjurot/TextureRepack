@@ -1,5 +1,8 @@
 #include "LHelperBindings.h"
 
+// Lua return code
+int TexRPCli::Lua::HelperBindings::luaReturnCode = 0;
+
 void TexRPCli::Lua::HelperBindings::bind(lua_State* ptrState) {
 	// === Console ===
 	// Functions
@@ -39,6 +42,13 @@ void TexRPCli::Lua::HelperBindings::bind(lua_State* ptrState) {
 	lua_register(ptrState, "GetAppDir", &TexRPCli::Lua::HelperBindings::lua_GetAppDir);
 	lua_register(ptrState, "GetWorkDir", &TexRPCli::Lua::HelperBindings::lua_GetWorkDir);
 	lua_register(ptrState, "GetUserDir", &TexRPCli::Lua::HelperBindings::lua_GetUserDir);
+
+	// === Return code ===
+	lua_register(ptrState, "ReturnCode", &TexRPCli::Lua::HelperBindings::lua_ReturnCode);
+}
+
+int TexRPCli::Lua::HelperBindings::getScriptReturnCode() {
+	return luaReturnCode;
 }
 
 int TexRPCli::Lua::HelperBindings::lua_ConsoleWriteLine(lua_State* ptrState) {
@@ -172,4 +182,15 @@ int TexRPCli::Lua::HelperBindings::lua_GetUserDir(lua_State* ptrState) {
 	// Lua push path
 	lua_pushstring(ptrState, TexRPCli::DefaultDirs::getUserDir());
 	return 1;
+}
+
+int TexRPCli::Lua::HelperBindings::lua_ReturnCode(lua_State* ptrState) {
+	// Check code
+	if (lua_isinteger(ptrState, 1)) {
+		// Get code
+		luaReturnCode = lua_tointeger(ptrState, 1);
+	}
+
+	// void
+	return 0;
 }

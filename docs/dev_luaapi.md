@@ -269,6 +269,12 @@ booleanReturnType = FileDelete(".\\myFile.txt") -- Deletes a file
 booleanReturnType = FileMove(".\\myFile.txt", ".\\output\\myFile.txt") -- Moves / Renames a file
 ```
 
+##### Application return code
+
+```lua
+ReturnCode(0) -- Sets the applications return code
+```
+
 
 
 

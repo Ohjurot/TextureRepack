@@ -21,7 +21,6 @@
 /*
 * TODO:
 * - Command line arguments
-* - Add return codes
 * (- Advanced error handling)
 */
 
@@ -78,5 +77,5 @@ int main(int argc, char** argv) {
 	Lua::HandleManager::get().release();
 
 	// Passed OK
-	return 0;
+	return Lua::HelperBindings::getScriptReturnCode();
 }

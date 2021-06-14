@@ -1,4 +1,5 @@
 -- Console title
+ReturnCode(-1)
 ConsoleTitle("TexRP - Substance Painter Interactive Script")
 
 -- Get and check GPU interface
@@ -84,6 +85,7 @@ if CheckHandle(interface) then
                                     table.insert(indexArr, IGPUTextureStack_LoadFromDisk(textures, imgPath))
                                 end
                                 
+                                runOk = true
                                 if #indexArr == subCount then
                                     outputFile = GetWorkDir() .. "\\" .. mdlName .. "_" .. name .. "." .. imgExt
                                     indexTarget = IGPUTextureStack_CreateEmpty(textures, indexArr[1], outputFile)
@@ -106,21 +108,34 @@ if CheckHandle(interface) then
                                                 ConsoleColor(CONSOLE_COLOR_RED)
                                                 ConsoleWriteLine("Failed to write \"" .. outputFile .. "\"")
                                                 ConsoleColor(CONSOLE_COLOR_WHITE)
+
+                                                runOk = false
                                             end
                                         else
                                             ConsoleColor(CONSOLE_COLOR_RED)
                                             ConsoleWriteLine("Failed to merge textures for " .. name)
                                             ConsoleColor(CONSOLE_COLOR_WHITE)
+
+                                            runOk = false
                                         end
                                     else
                                         ConsoleColor(CONSOLE_COLOR_RED)
                                         ConsoleWriteLine("Failed to allocate empty texture for " .. name)
                                         ConsoleColor(CONSOLE_COLOR_WHITE)
+
+                                        runOk = false
                                     end
                                 else
                                     ConsoleColor(CONSOLE_COLOR_RED)
                                     ConsoleWriteLine("Failed to load textures for " .. name)
                                     ConsoleColor(CONSOLE_COLOR_WHITE)
+
+                                    runOk = false
+                                end
+
+                                -- Return code when ok
+                                if runOk then
+                                    ReturnCode(0)
                                 end
                             else
                                 ConsoleColor(CONSOLE_COLOR_RED)
