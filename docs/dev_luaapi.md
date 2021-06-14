@@ -1,3 +1,5 @@
+
+
 # Scripting Documentation | Lua API
 
 ### Handles
@@ -9,7 +11,7 @@ It is best pratice to close a handle after use (to free all associated resources
 ##### Checking the status of a Handle
 
 ```lua
-booleanReturnValue = CheckHandle(handle) -- Handle is integer / handle
+booleanReturnType = CheckHandle(handle) -- Handle is integer / handle
 ```
 
 
@@ -17,7 +19,7 @@ booleanReturnValue = CheckHandle(handle) -- Handle is integer / handle
 ##### Getting the type of a Handle
 
 ```lua
-stringReturnValue = GetHandleType(handle) -- Handle is integer / handle
+stringReturnType = GetHandleType(handle) -- Handle is integer / handle
 ```
 
 Possible values are:
@@ -35,9 +37,128 @@ Possible values are:
 CloseHandle(handle) -- Handle is integer / handle
 ```
 
+
+
+**!!!! EVERY FUNCTION THAT RETURNS AN HANDLE MAY RETURN `NIL` ON FAILURE !!!**
+
+
+
 ------
 
 ### TexRPLib Lua Bindings
+
+##### Enumerating GPUs
+
+```lua
+handleReturnType = EnumGpuInterfaces(0) -- Index of gpu is system returns handle
+```
+
+Returns a handle of type `GPUInterface` when GPU index is valid. Returns Nil when no GPU with that index is available. Handle needs to be closed after usage.
+
+#### IGPUInterface (Functions for `GPUInterface` handles)
+
+##### Retrieving the name of the GPU
+
+```lua
+stringReturnType = IGPUInterface_GetGPUName(gpuInterfaceHandle) -- First parameter must be a valid handle of type GPUInterface
+```
+
+##### Retrieving the GPU unique ID
+
+```lua
+integerReturnType = IGPUInterface_GetGPUUniqueId(gpuInterfaceHandle) -- First parameter must be a valid handle of type GPUInterface
+```
+
+##### Retrieving the currently free VRAM
+
+```lua
+integerReturnType = IGPUInterface_GetGPUFreeVRAM(gpuInterfaceHandle) -- First parameter must be a valid handle of type GPUInterface
+```
+
+##### Creating a GPU context
+
+```lua
+handleReturnType = IGPUInterface_CreateContex(gpuInterfaceHandle) -- First parameter must be a valid handle of type GPUInterface
+```
+
+Returns a handle of type `GPUContext`. A context is required to load geometry and textures to the GPU and for merging textures. Handle needs to be closed after usage.
+
+
+
+#### IGPUContext (Functions for `GPUContext` handles)
+
+##### Creating a Texture Stack
+
+```lua
+handleReturnType = IGPUContext_CreateTextureStack(gpuContextHandle) -- First parameter must be a valid handle of type GPUContext
+```
+
+Returns a handle of type `GPUTextureStack`. A texture stack is holding all textures (Source and destination textures for merge). Handle needs to be closed after usage.
+
+##### Loading a 3D-Model
+
+```lua
+handleReturnType = IGPUContext_OpenModell(gpuContextHandle, ".\\mypath\\modell.fbx") -- First parameter must be a valid handle of type GPUContext
+```
+
+Returns a handle of type `GPUGeometryModell`. In case the model is invalid Nil is returned. Represents the 3D Model on the GPU. Handle needs to be closed after usage.
+
+##### Merging textures
+
+```lua
+-- gpuContextHandle: must be a valid handle of type GPUContext
+-- textureStackHandle: must be a valid handle of type GPUTextureStack
+-- outputIndex: must be a integer representing a texture in the given texture stack (textureStackHandle)
+-- inputCount: must specify the numbers of input textures (and masks) merged together
+-- masks... : one or many handles of type IGPUMask
+-- inputIndex... : one or many indicies representing a texture in the given texture stack (textureStackHandle)
+booleanReturnType = IGPUContext_MergTextures(gpuContextHandle, textureStackHandle, outputIndex, inputCount, masks..., inputIndex...) 
+```
+
+
+
+#### IGPUGeometryModell (Functions for `GPUGeometryModell` handles)
+
+##### Retrieving the submodel count (Meshes)
+
+```lua
+integerReturnType = IGPUGeometryModell_GetSubmodellCount(gpuGeometryModellHandle) -- First parameter must be a valid handle of type GPUGeometryModell
+```
+
+##### Retrieving the name of a submodel
+
+```lua
+stringReturnType = IGPUGeometryModell_GetSubmodellName(gpuGeometryModellHandle, submodellIndex) -- First parameter must be a valid handle of type GPUGeometryModell
+```
+
+##### Retrieving the material name of a submodel
+
+```lua
+stringReturnType = IGPUGeometryModell_GetSubmodellMaterialName(gpuGeometryModellHandle, submodellIndex) -- First parameter must be a valid handle of type GPUGeometryModell
+```
+
+##### Retrieving the UV set index of a submodel
+
+```lua
+integerReturnType = IGPUGeometryModell_GetUVSetIndex(gpuGeometryModellHandle, submodellIndex) -- First parameter must be a valid handle of type GPUGeometryModell
+```
+
+##### Retrieving the vertex count of a submodel
+
+```lua
+integerReturnType = IGPUGeometryModell_GetVerticesCount(gpuGeometryModellHandle, submodellIndex) -- First parameter must be a valid handle of type GPUGeometryModell
+```
+
+##### Creating a mask for a submodel
+
+```lua
+-- gpuGeometryModellHandle: must be a valid handle of type GPUGeometryModell
+-- submodellIndex: Index of the submodel to gennerate mask for
+-- maskResolution: Resolution of the mask (should be eqal to texture resoltion)
+handleReturnType = IGPUGeometryModell_CreateMask(gpuGeometryModellHandle, submodellIndex, maskResolution)
+```
+
+Returns a handle of type `GPUMask`. Representing the coverage of the submodel in texture space (UV). Used to mask all pixels from the source texture that corresponds to that model. Handle needs to be closed after usage.
 
 
 
@@ -96,6 +217,3 @@ booleanReturnType = FileCopy(".\\myFile.txt", ".\\myFile_copy.txt") -- Copys a f
 booleanReturnType = FileDelete(".\\myFile.txt") -- Deletes a file
 booleanReturnType = FileMove(".\\myFile.txt", ".\\output\\myFile.txt") -- Moves / Renames a file
 ```
-
-
-
